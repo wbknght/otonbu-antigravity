@@ -36,7 +36,7 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
         <>
             <button
                 onClick={() => { setIsOpen(true); setError(null); }}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 rounded-xl font-medium transition-all min-h-[48px] active:scale-95"
             >
                 <Plus className="w-5 h-5" />
                 New Job
@@ -64,7 +64,7 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
                                     value={plate}
                                     onChange={e => setPlate(e.target.value.toUpperCase())}
                                     placeholder="ABC-123"
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 h-12 text-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -75,7 +75,7 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
                                 <select
                                     value={serviceId}
                                     onChange={e => setServiceId(e.target.value)}
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 h-12 text-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     {serviceTypes.map(st => (
                                         <option key={st.id} value={st.id}>{st.name}</option>
@@ -87,14 +87,14 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
                                 <button
                                     type="button"
                                     onClick={() => setIsOpen(false)}
-                                    className="px-4 py-2 text-zinc-400 hover:text-white"
+                                    className="px-5 py-3 min-h-[48px] rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 active:bg-zinc-700 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
+                                    className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 py-3 min-h-[48px] rounded-xl font-medium disabled:opacity-50 transition-all active:scale-95"
                                 >
                                     {loading ? 'Creating...' : 'Create Job'}
                                 </button>

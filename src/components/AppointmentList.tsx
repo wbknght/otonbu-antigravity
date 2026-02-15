@@ -97,12 +97,12 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                         <button
                             onClick={() => handleConvert(apt.id)}
                             disabled={!!processingId}
-                            className="mt-2 w-full flex items-center justify-center gap-2 bg-white text-black py-2 rounded-lg font-bold hover:bg-zinc-200 transition-colors disabled:opacity-50"
+                            className="mt-2 w-full flex items-center justify-center gap-2 bg-white text-black py-3 min-h-[52px] rounded-xl font-bold text-base hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.98] transition-all disabled:opacity-50"
                         >
                             {processingId === apt.id ? 'Starting...' : (
                                 <>
                                     Check In / Start Job
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight className="w-5 h-5" />
                                 </>
                             )}
                         </button>

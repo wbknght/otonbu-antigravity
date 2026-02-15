@@ -18,7 +18,7 @@ export function KanbanColumn({ id, title, jobs }: KanbanColumnProps) {
     })
 
     return (
-        <div className="flex flex-col h-full min-w-[300px] bg-zinc-900/50 rounded-xl border border-zinc-800">
+        <div className="flex flex-col h-full flex-1 min-w-[260px] bg-zinc-900/50 rounded-xl border border-zinc-800">
             <div className="p-4 border-b border-zinc-800 flex justify-between items-center">
                 <h3 className="font-semibold text-zinc-100">{title}</h3>
                 <span className="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded-full">

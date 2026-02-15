@@ -126,9 +126,9 @@ export function KanbanBoard({ initialJobs }: KanbanBoardProps) {
 
     if (!isMounted) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-[calc(100vh-140px)]">
+            <div className="flex gap-4 h-[calc(100vh-140px)] overflow-x-auto pb-4">
                 {KANBAN_COLUMNS.map((col) => (
-                    <div key={col.id} className="flex flex-col h-full min-w-[300px] bg-zinc-900/50 rounded-xl border border-zinc-800">
+                    <div key={col.id} className="flex flex-col h-full flex-1 min-w-[260px] bg-zinc-900/50 rounded-xl border border-zinc-800">
                         <div className="p-4 border-b border-zinc-800 flex justify-between items-center">
                             <h3 className="font-semibold text-zinc-100">{col.title}</h3>
                             <span className="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded-full">
@@ -169,7 +169,7 @@ export function KanbanBoard({ initialJobs }: KanbanBoardProps) {
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-[calc(100vh-140px)]">
+            <div className="flex gap-4 h-[calc(100vh-140px)] overflow-x-auto pb-4">
                 {KANBAN_COLUMNS.map((col) => (
                     <KanbanColumn
                         key={col.id}

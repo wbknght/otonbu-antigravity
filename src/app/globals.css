@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+/* ===== Tablet / Touch Optimizations ===== */
+
+/* Prevent 300ms tap delay & double-tap-to-zoom on touch devices */
+html {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Smooth scrolling for app-like feel */
+* {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbars for cleaner app-like appearance, but keep scroll functionality */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Prevent text selection on interactive elements for app-like feel */
+button,
+[role="button"],
+.no-select {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Active press feedback for touch */
+button:active,
+[role="button"]:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+}
