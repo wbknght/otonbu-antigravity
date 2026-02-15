@@ -34,7 +34,7 @@ export function GlobalSearch() {
             <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by plate number..."
+                placeholder="Plaka ile ara..."
                 className={cn(
                     "w-full bg-zinc-800 border border-zinc-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all",
                     isPending && "opacity-50"

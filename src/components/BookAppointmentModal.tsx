@@ -33,7 +33,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
             }
         } catch (error) {
             console.error(error)
-            alert('Booking failed')
+            alert('Randevu oluşturulamadı')
         } finally {
             setIsLoading(false)
         }
@@ -43,7 +43,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-white">Book Appointment</h2>
+                    <h2 className="text-xl font-bold text-white">Randevu Oluştur</h2>
                     <button onClick={onClose} className="p-1 hover:bg-zinc-800 rounded">
                         <X className="w-5 h-5 text-zinc-400" />
                     </button>
@@ -52,7 +52,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
                 <form action={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-1">
-                            Customer Name
+                            Müşteri Adı
                         </label>
                         <input
                             name="customerName"
@@ -63,7 +63,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
 
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-1">
-                            Phone Number
+                            Telefon Numarası
                         </label>
                         <input
                             name="customerPhone"
@@ -74,7 +74,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
 
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-1">
-                            Plate Number (Optional)
+                            Plaka Numarası (İsteğe bağlı)
                         </label>
                         <input
                             name="plateNumber"
@@ -84,7 +84,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
 
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-1">
-                            Date & Time
+                            Tarih ve Saat
                         </label>
                         <input
                             name="scheduledTime"
@@ -96,17 +96,17 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
 
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-1">
-                            Service Type
+                            Hizmet Türü
                         </label>
                         <select
                             name="serviceTypeId"
                             required
                             className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
                         >
-                            <option value="">Select a service...</option>
+                            <option value="">Hizmet seçin...</option>
                             {serviceTypes.map((st) => (
                                 <option key={st.id} value={st.id}>
-                                    {st.name} (${st.price})
+                                    {st.name} (₺{st.price})
                                 </option>
                             ))}
                         </select>
@@ -119,13 +119,13 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
                                 name="isValet"
                                 className="w-5 h-5 rounded border-zinc-700 bg-zinc-800 text-blue-600 focus:ring-blue-500"
                             />
-                            <span className="text-white font-medium">Request Valet Pickup</span>
+                            <span className="text-white font-medium">Vale Hizmeti İste</span>
                         </label>
 
                         <div className="pl-7">
                             <input
                                 name="valetAddress"
-                                placeholder="Pickup Address (if Valet selected)"
+                                placeholder="Alım Adresi (Vale seçildiyse)"
                                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                             />
                         </div>
@@ -140,7 +140,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
                             isLoading && "opacity-50 cursor-not-allowed"
                         )}
                     >
-                        {isLoading ? 'Booking...' : 'Confirm Booking'}
+                        {isLoading ? 'Oluşturuluyor...' : 'Randevuyu Onayla'}
                     </button>
                 </form>
             </div>

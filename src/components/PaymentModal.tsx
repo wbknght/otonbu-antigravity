@@ -15,7 +15,6 @@ interface PaymentModalProps {
 export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [method, setMethod] = useState<PaymentMethod | null>(null)
-    // Default to service price, fallback to 0 if missing
     const [amount, setAmount] = useState<string>(job.service_types?.price?.toString() || '0')
 
     if (!isOpen) return null
@@ -33,7 +32,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
             }
         } catch (error) {
             console.error(error)
-            alert('Payment failed')
+            alert('Ödeme başarısız')
         } finally {
             setIsLoading(false)
         }
@@ -44,7 +43,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
             <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-white">Record Payment</h2>
+                        <h2 className="text-xl font-bold text-white">Ödeme Al</h2>
                         <p className="text-sm text-zinc-400">{job.plate_number} • {job.service_types?.name}</p>
                     </div>
                     <button onClick={onClose} className="p-1 hover:bg-zinc-800 rounded">
@@ -55,10 +54,10 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-2">
-                            Amount
+                            Tutar
                         </label>
                         <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">₺</span>
                             <input
                                 type="number"
                                 value={amount}
@@ -70,7 +69,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
 
                     <div>
                         <label className="block text-sm font-medium text-zinc-400 mb-2">
-                            Payment Method
+                            Ödeme Yöntemi
                         </label>
                         <div className="grid grid-cols-3 gap-3">
                             <button
@@ -83,7 +82,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 )}
                             >
                                 <Banknote className="w-6 h-6" />
-                                <span className="text-xs font-medium">Cash</span>
+                                <span className="text-xs font-medium">Nakit</span>
                             </button>
                             <button
                                 onClick={() => setMethod('card')}
@@ -95,7 +94,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 )}
                             >
                                 <CreditCard className="w-6 h-6" />
-                                <span className="text-xs font-medium">Card</span>
+                                <span className="text-xs font-medium">Kart</span>
                             </button>
                             <button
                                 onClick={() => setMethod('transfer')}
@@ -107,7 +106,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 )}
                             >
                                 <Landmark className="w-6 h-6" />
-                                <span className="text-xs font-medium">Transfer</span>
+                                <span className="text-xs font-medium">Havale</span>
                             </button>
                         </div>
                     </div>
@@ -122,7 +121,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                         )}
                     >
-                        {isLoading ? 'Processing...' : 'Confirm Payment'}
+                        {isLoading ? 'İşleniyor...' : 'Ödemeyi Onayla'}
                     </button>
                 </div>
             </div>

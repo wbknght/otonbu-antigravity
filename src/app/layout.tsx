@@ -21,12 +21,12 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "WashOps",
-  description: "Car wash operations management",
+  title: "Otonbu",
+  description: "Oto yıkama operasyon yönetimi",
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'WashOps',
+    title: 'Otonbu',
   },
 };
 
@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

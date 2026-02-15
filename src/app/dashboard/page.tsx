@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     return (
         <div className="h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-white">Panel</h1>
                 <AddJobButton serviceTypes={serviceTypes} />
             </div>
 

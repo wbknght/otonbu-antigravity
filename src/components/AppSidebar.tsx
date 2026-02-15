@@ -17,10 +17,10 @@ import { cn } from '@/lib/utils'
 import { GlobalSearch } from './GlobalSearch'
 
 const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'History', href: '/dashboard/history', icon: History },
-    { name: 'Schedule', href: '/dashboard/schedule', icon: Calendar },
-    { name: 'Admin', href: '/admin', icon: Settings },
+    { name: 'Panel', href: '/dashboard', icon: Home },
+    { name: 'Geçmiş', href: '/dashboard/history', icon: History },
+    { name: 'Randevular', href: '/dashboard/schedule', icon: Calendar },
+    { name: 'Yönetim', href: '/admin', icon: Settings },
 ]
 
 export function AppSidebar() {
@@ -54,7 +54,7 @@ export function AppSidebar() {
                 </button>
                 <div className="flex items-center font-bold text-lg tracking-wider text-white">
                     <CarFront className="mr-2 h-5 w-5 text-blue-500" />
-                    WASH<span className="text-blue-500">OPS</span>
+                    OTON<span className="text-blue-500">BU</span>
                 </div>
             </div>
 
@@ -82,7 +82,7 @@ export function AppSidebar() {
                 <div className="flex h-16 items-center justify-between px-6">
                     <div className="flex items-center font-bold text-xl tracking-wider">
                         <CarFront className="mr-2 h-6 w-6 text-blue-500" />
-                        WASH<span className="text-blue-500">OPS</span>
+                        OTON<span className="text-blue-500">BU</span>
                     </div>
                     <button
                         onClick={() => setIsOpen(false)}
@@ -132,7 +132,7 @@ export function AppSidebar() {
                 <div className="border-t border-zinc-800 p-4">
                     <button className="group flex w-full items-center rounded-xl px-4 py-3.5 text-base font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700 min-h-[48px]">
                         <LogOut className="mr-3 h-5 w-5 text-zinc-500 group-hover:text-white" />
-                        Sign Out
+                        Çıkış Yap
                     </button>
                 </div>
             </div>

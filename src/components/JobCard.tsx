@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Job } from '@/types'
-import { Clock, Archive, CreditCard } from 'lucide-react'
+import { Job, VEHICLE_CLASS_LABELS } from '@/types'
+import { Clock, Archive, CreditCard, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PaymentModal } from './PaymentModal'
+import { JobDetailsDrawer } from './JobDetailsDrawer'
 import { archiveJob } from '@/app/actions/jobs'
 
 interface JobCardProps {
@@ -15,6 +16,7 @@ interface JobCardProps {
 
 export function JobCard({ job }: JobCardProps) {
     const [showPaymentModal, setShowPaymentModal] = useState(false)
+    const [showDrawer, setShowDrawer] = useState(false)
     const [isArchiving, setIsArchiving] = useState(false)
 
     const {
@@ -37,7 +39,7 @@ export function JobCard({ job }: JobCardProps) {
         transition,
     }
 
-    const timeElapsed = '10m'
+    const timeElapsed = '10dk'
 
     async function handleArchive(e: React.MouseEvent) {
         e.stopPropagation()
@@ -57,6 +59,7 @@ export function JobCard({ job }: JobCardProps) {
     }
 
     const hasActions = job.payment_status === 'pending' || (job.payment_status === 'paid' && job.status === 'completed')
+    const vehicleClassLabel = job.cars?.vehicle_class ? VEHICLE_CLASS_LABELS[job.cars.vehicle_class] : null
 
     return (
         <>
@@ -69,24 +72,48 @@ export function JobCard({ job }: JobCardProps) {
                     "bg-zinc-800 p-4 rounded-xl border border-zinc-700 hover:border-zinc-600",
                     "cursor-grab active:cursor-grabbing shadow-sm",
                     "flex flex-col gap-2 group relative",
-                    "touch-none" // Prevent browser touch scroll when dragging
+                    "touch-none"
                 )}
+                onDoubleClick={() => setShowDrawer(true)}
             >
+                {/* Row 1: Plate + Time */}
                 <div className="flex justify-between items-start">
-                    <span className="text-2xl font-black tracking-wider text-white">
-                        {job.plate_number}
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-2xl font-black tracking-wider text-white">
+                            {job.plate_number}
+                        </span>
+                        {job.cars?.has_damage && (
+                            <span title="Hasar">
+                                <AlertTriangle className="w-4 h-4 text-orange-400" />
+                            </span>
+                        )}
+                    </div>
                     <div className="flex items-center text-xs text-zinc-400 bg-zinc-900/50 px-2 py-1 rounded">
                         <Clock className="w-3 h-3 mr-1" />
                         {timeElapsed}
                     </div>
                 </div>
 
-                <div className="text-sm text-zinc-400 flex justify-between">
-                    <span>{job.service_types?.name || 'Unknown Service'}</span>
-                    <span className="font-mono text-zinc-500">${job.service_types?.price}</span>
+                {/* Row 2: Service + Price + Vehicle Class */}
+                <div className="text-sm text-zinc-400 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        {vehicleClassLabel && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-300 font-medium uppercase tracking-wide">
+                                {vehicleClassLabel}
+                            </span>
+                        )}
+                        {job.cars?.color && (
+                            <span className="text-[10px] text-zinc-500">{job.cars.color}</span>
+                        )}
+                    </div>
+                    <span className="font-mono text-zinc-500">₺{job.service_types?.price}</span>
                 </div>
 
+                <div className="text-sm text-zinc-400">
+                    {job.service_types?.name || 'Bilinmeyen Hizmet'}
+                </div>
+
+                {/* Row 3: Status + Actions */}
                 <div className="mt-1 flex justify-between items-center">
                     <span className={cn(
                         "text-xs px-2.5 py-1 rounded-full font-medium",
@@ -94,10 +121,9 @@ export function JobCard({ job }: JobCardProps) {
                             ? "bg-green-900/30 text-green-400"
                             : "bg-yellow-900/30 text-yellow-400"
                     )}>
-                        {job.payment_status.toUpperCase()}
+                        {job.payment_status === 'paid' ? 'ÖDENDİ' : 'BEKLİYOR'}
                     </span>
 
-                    {/* Always visible action buttons — no hover required for touch */}
                     {hasActions && (
                         <div className="flex gap-2">
                             {job.payment_status === 'pending' && (
@@ -109,16 +135,16 @@ export function JobCard({ job }: JobCardProps) {
                                     }}
                                     className={cn(
                                         "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium",
-                                        "min-h-[44px] min-w-[44px]", // Apple HIG touch target
+                                        "min-h-[44px] min-w-[44px]",
                                         "bg-blue-600/20 text-blue-400",
                                         "hover:bg-blue-600 hover:text-white",
                                         "active:bg-blue-700 active:scale-95",
                                         "transition-all"
                                     )}
-                                    title="Record Payment"
+                                    title="Ödeme Al"
                                 >
                                     <CreditCard className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Pay</span>
+                                    <span className="hidden sm:inline">Öde</span>
                                 </button>
                             )}
 
@@ -136,11 +162,11 @@ export function JobCard({ job }: JobCardProps) {
                                         "transition-all",
                                         isArchiving && "opacity-50 cursor-not-allowed"
                                     )}
-                                    title="Archive Job"
+                                    title="Arşivle"
                                 >
                                     <Archive className="w-4 h-4" />
                                     <span className="hidden sm:inline">
-                                        {isArchiving ? '...' : 'Done'}
+                                        {isArchiving ? '...' : 'Bitti'}
                                     </span>
                                 </button>
                             )}
@@ -153,6 +179,14 @@ export function JobCard({ job }: JobCardProps) {
                 job={job}
                 isOpen={showPaymentModal}
                 onClose={() => setShowPaymentModal(false)}
+            />
+
+            <JobDetailsDrawer
+                isOpen={showDrawer}
+                onClose={() => setShowDrawer(false)}
+                jobId={job.id}
+                car={job.cars || null}
+                customer={job.customers || null}
             />
         </>
     )

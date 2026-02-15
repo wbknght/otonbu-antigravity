@@ -9,7 +9,7 @@ export default async function SchedulePage() {
     const appointments = await getAppointments()
     const serviceTypes = await getServiceTypes()
 
-    if (!appointments) return <div className="text-white">Failed to load appointments.</div>
+    if (!appointments) return <div className="text-white">Randevular yüklenemedi.</div>
 
     return (
         <div className="max-w-7xl mx-auto h-full flex flex-col">

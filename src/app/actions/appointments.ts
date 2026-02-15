@@ -38,7 +38,7 @@ export async function createAppointment(formData: FormData) {
 
     // Validate
     if (!customerName || !scheduledTime || !serviceTypeId) {
-        return { error: 'Missing required fields' }
+        return { error: 'Zorunlu alanlar eksik' }
     }
 
     const { error } = await supabase
@@ -57,7 +57,7 @@ export async function createAppointment(formData: FormData) {
 
     if (error) {
         console.error('Error creating appointment:', error)
-        return { error: 'Failed to create appointment' }
+        return { error: 'Randevu oluşturulamadı' }
     }
 
     revalidatePath('/dashboard/schedule')
@@ -75,7 +75,7 @@ export async function convertAppointmentToJob(appointmentId: string) {
         .single()
 
     if (fetchError || !appointment) {
-        return { error: 'Appointment not found' }
+        return { error: 'Randevu bulunamadı' }
     }
 
     // 2. Create Job
@@ -114,11 +114,11 @@ export async function convertAppointmentToJob(appointmentId: string) {
 
                 revalidatePath('/dashboard')
                 revalidatePath('/dashboard/schedule')
-                return { success: true, jobId: existingJob.id, message: 'Job already active. Linked appointment.' }
+                return { success: true, jobId: existingJob.id, message: 'Zaten aktif iş var. Randevu bağlandı.' }
             }
         }
         console.error('Error converting to job:', jobError)
-        return { error: 'Failed to create job' }
+        return { error: 'İş oluşturulamadı' }
     }
 
     // 3. Update Appointment Status

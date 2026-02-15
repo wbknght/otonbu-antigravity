@@ -21,7 +21,6 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
         if (result && 'error' in result) {
             alert(result.error)
         } else if (result?.success) {
-            // Optional: Redirect to dashboard to see the job
             window.location.href = '/dashboard'
         }
     }
@@ -30,8 +29,8 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
         return (
             <div className="text-center py-12 bg-zinc-900 border border-zinc-800 rounded-xl">
                 <Calendar className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-zinc-300">No upcoming appointments</h3>
-                <p className="text-zinc-500">Book a slot to get started.</p>
+                <h3 className="text-lg font-medium text-zinc-300">Yaklaşan randevu yok</h3>
+                <p className="text-zinc-500">Başlamak için bir randevu oluşturun.</p>
             </div>
         )
     }
@@ -64,23 +63,23 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                                 apt.status === 'completed' ? "bg-green-900/20 text-green-400 border-green-900/50" :
                                     "bg-zinc-800 text-zinc-400 border-zinc-700"
                         )}>
-                            {apt.status.toUpperCase()}
+                            {apt.status === 'booked' ? 'PLANLANDΙ' : apt.status === 'completed' ? 'TAMAMLANDI' : apt.status.toUpperCase()}
                         </span>
                     </div>
 
                     {apt.is_valet && (
                         <div className="bg-purple-900/20 border border-purple-900/50 p-2 rounded text-xs text-purple-300 flex items-start gap-2">
-                            <span className="font-bold uppercase tracking-wider text-purple-400">Valet</span>
-                            <span className="opacity-80 break-all">{apt.valet_address || 'No address provided'}</span>
+                            <span className="font-bold uppercase tracking-wider text-purple-400">Vale</span>
+                            <span className="opacity-80 break-all">{apt.valet_address || 'Adres belirtilmedi'}</span>
                         </div>
                     )}
 
                     <div className="flex items-center gap-2 text-sm text-zinc-300 bg-zinc-800/50 p-2 rounded">
                         <Calendar className="w-4 h-4 text-zinc-500" />
-                        {new Date(apt.scheduled_time).toLocaleDateString()}
+                        {new Date(apt.scheduled_time).toLocaleDateString('tr-TR')}
                         <span className="text-zinc-600">|</span>
                         <Clock className="w-4 h-4 text-zinc-500" />
-                        {new Date(apt.scheduled_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(apt.scheduled_time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
 
                     <div className="flex justify-between items-center text-sm">
@@ -99,9 +98,9 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                             disabled={!!processingId}
                             className="mt-2 w-full flex items-center justify-center gap-2 bg-white text-black py-3 min-h-[52px] rounded-xl font-bold text-base hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.98] transition-all disabled:opacity-50"
                         >
-                            {processingId === apt.id ? 'Starting...' : (
+                            {processingId === apt.id ? 'Başlatılıyor...' : (
                                 <>
-                                    Check In / Start Job
+                                    Giriş Yap / İşi Başlat
                                     <ArrowRight className="w-5 h-5" />
                                 </>
                             )}
@@ -111,7 +110,7 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                     {apt.status === 'completed' && apt.converted_job_id && (
                         <div className="mt-2 text-center text-xs text-green-500 flex items-center justify-center gap-1">
                             <CheckCircle className="w-3 h-3" />
-                            Converted to Job
+                            İşe Dönüştürüldü
                         </div>
                     )}
                 </div>
