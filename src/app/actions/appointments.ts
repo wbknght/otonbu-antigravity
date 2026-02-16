@@ -10,7 +10,8 @@ export async function getAppointments() {
         .from('appointments')
         .select(`
             *,
-            service_types (
+            *,
+            services (
                 name,
                 price
             )
@@ -32,12 +33,12 @@ export async function createAppointment(formData: FormData) {
     const customerPhone = formData.get('customerPhone') as string
     const plateNumber = formData.get('plateNumber') as string
     const scheduledTime = formData.get('scheduledTime') as string
-    const serviceTypeId = formData.get('serviceTypeId') as string
+    const serviceId = formData.get('serviceTypeId') as string
     const isValet = formData.get('isValet') === 'on'
     const valetAddress = formData.get('valetAddress') as string
 
     // Validate
-    if (!customerName || !scheduledTime || !serviceTypeId) {
+    if (!customerName || !scheduledTime || !serviceId) {
         return { error: 'Zorunlu alanlar eksik' }
     }
 
@@ -49,7 +50,7 @@ export async function createAppointment(formData: FormData) {
                 customer_phone: customerPhone,
                 plate_number: plateNumber?.toUpperCase(),
                 scheduled_time: scheduledTime,
-                service_type_id: serviceTypeId,
+                service_id: serviceId,
                 is_valet: isValet,
                 valet_address: isValet ? valetAddress : null
             }
@@ -84,7 +85,7 @@ export async function convertAppointmentToJob(appointmentId: string) {
         .insert([
             {
                 plate_number: appointment.plate_number || 'UNKNOWN',
-                service_type_id: appointment.service_type_id,
+                service_id: appointment.service_id,
                 status: 'queue',
                 payment_status: 'pending'
             }

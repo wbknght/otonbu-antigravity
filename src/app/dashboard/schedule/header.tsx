@@ -1,14 +1,13 @@
-'use client'
-
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { BookAppointmentModal } from '@/components/BookAppointmentModal'
+import { Service } from '@/types'
 
 interface ScheduleHeaderProps {
-    serviceTypes: any[]
+    services: Service[]
 }
 
-export function ScheduleHeader({ serviceTypes }: ScheduleHeaderProps) {
+export function ScheduleHeader({ services }: ScheduleHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     return (
@@ -31,7 +30,7 @@ export function ScheduleHeader({ serviceTypes }: ScheduleHeaderProps) {
             <BookAppointmentModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                serviceTypes={serviceTypes}
+                services={services}
             />
         </div>
     )

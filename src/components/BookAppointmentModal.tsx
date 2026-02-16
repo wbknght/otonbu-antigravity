@@ -1,23 +1,16 @@
-'use client'
-
 import { useState } from 'react'
 import { createAppointment } from '@/app/actions/appointments'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-interface ServiceType {
-    id: string
-    name: string
-    price: number
-}
+import { Service } from '@/types'
 
 interface BookAppointmentModalProps {
     isOpen: boolean
     onClose: () => void
-    serviceTypes: ServiceType[]
+    services: Service[]
 }
 
-export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppointmentModalProps) {
+export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointmentModalProps) {
     const [isLoading, setIsLoading] = useState(false)
 
     if (!isOpen) return null
@@ -104,7 +97,7 @@ export function BookAppointmentModal({ isOpen, onClose, serviceTypes }: BookAppo
                             className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="">Hizmet seçin...</option>
-                            {serviceTypes.map((st) => (
+                            {services.map((st) => (
                                 <option key={st.id} value={st.id}>
                                     {st.name} (₺{st.price})
                                 </option>
