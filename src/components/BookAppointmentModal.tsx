@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { createAppointment } from '@/app/actions/appointments'
 import { X } from 'lucide-react'
