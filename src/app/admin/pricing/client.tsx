@@ -13,6 +13,7 @@ import {
     upsertPriceRule,
     deletePriceRule,
 } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface PriceList {
     id: string
@@ -68,6 +69,7 @@ export function PricingClient({
     const [ruleModalOpen, setRuleModalOpen] = useState(false)
     const [editingRule, setEditingRule] = useState<PriceRule | null>(null)
     const [confirmDeleteRule, setConfirmDeleteRule] = useState<PriceRule | null>(null)
+    const { currentBranch } = useBranch()
     const [isPending, startTransition] = useTransition()
 
     // Rule form state

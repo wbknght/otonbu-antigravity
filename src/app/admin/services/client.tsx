@@ -7,6 +7,7 @@ import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog'
 import { upsertService, toggleServiceActive, deleteService } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface Service {
     id: string
@@ -31,6 +32,7 @@ export function ServicesClient({ initialServices }: { initialServices: Service[]
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<Service | null>(null)
     const [confirmDelete, setConfirmDelete] = useState<Service | null>(null)
+    const { currentBranch } = useBranch()
     const [isPending, startTransition] = useTransition()
 
     const filtered = initialServices.filter(s => {

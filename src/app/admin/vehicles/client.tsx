@@ -7,6 +7,7 @@ import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog'
 import { upsertVehicleClass, toggleVehicleClassActive } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface VehicleClass {
     id: string
@@ -28,6 +29,7 @@ export function VehiclesClient({ initialClasses }: { initialClasses: VehicleClas
     const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all')
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<VehicleClass | null>(null)
+    const { currentBranch } = useBranch()
     const [isPending, startTransition] = useTransition()
 
     const filtered = initialClasses.filter(vc => {
