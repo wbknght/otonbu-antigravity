@@ -263,13 +263,17 @@ export function PricingClient({
                 title={editingList ? tr.pricing.editList : tr.pricing.addList}
                 fields={priceListFields}
                 initialData={editingList || { is_active: true }}
-                onSubmit={async (data) => upsertPriceList({
-                    id: editingList?.id,
-                    name: data.name,
-                    valid_from: data.valid_from,
-                    valid_to: data.valid_to,
-                    is_active: data.is_active,
-                })}
+                onSubmit={async (data) => {
+                    if (!currentBranch) return { error: 'Lütfen önce bir şube seçin' }
+                    return upsertPriceList({
+                        id: editingList?.id,
+                        name: data.name,
+                        valid_from: data.valid_from,
+                        valid_to: data.valid_to,
+                        is_active: data.is_active,
+                        branch_id: currentBranch.id,
+                    })
+                }}
             />
 
             {/* Price Rule Modal (custom) */}

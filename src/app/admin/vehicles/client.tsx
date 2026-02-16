@@ -170,12 +170,14 @@ export function VehiclesClient({ initialClasses }: { initialClasses: VehicleClas
                 fields={vehicleFields}
                 initialData={editing || { is_active: true, sort_order: 0 }}
                 onSubmit={async (data) => {
+                    if (!currentBranch) return { error: 'Lütfen önce bir şube seçin' }
                     return upsertVehicleClass({
                         id: editing?.id,
                         key: data.key,
                         label: data.label,
                         is_active: data.is_active,
                         sort_order: data.sort_order,
+                        branch_id: currentBranch.id,
                     })
                 }}
             />

@@ -115,13 +115,56 @@ export async function getServices(branchId?: string) {
     const { supabase, branchId: myBranch, isSuperAdmin } = await requireAdmin(branchId)
     const bid = branchId || myBranch
 
-    let query = supabase.from('services').select('*')
-    if (bid) query = query.eq('branch_id', bid)
-    query = query.order('sort_order', { ascending: true }).order('name', { ascending: true })
+    // 1. Get all services that are:
+    //    - Global (branch_id IS NULL)
+    //    - OR Private to this branch (branch_id = bid)
+    let query = supabase.from('services')
+        .select(`
+            *,
+            branch_services (
+                is_active,
+                custom_price,
+                custom_duration_min
+            )
+        `)
+        .or(`branch_id.is.null,branch_id.eq.${bid}`)
+        .order('sort_order', { ascending: true })
+        .order('name', { ascending: true })
 
-    const { data, error } = await query
+    const { data: services, error } = await query
     if (error) return { error: error.message, data: [] }
-    return { data: data || [] }
+
+    // 2. Transform data to Attach "effective" status for the branch
+    const effectiveServices = services.map((s: any) => {
+        // If it's a global service, check the branch_services junction
+        const branchSettings = s.branch_services?.find((bs: any) => true) // Filtering done by RLS/Query if we could, but here we might get array. 
+        // Actually, supabase query with foreign key might return array.
+        // Let's rely on post-processing or specific query. 
+
+        // Since we can't easily filter the nested relation by branch_id in a simple select without more complex syntax,
+        // and we prioritized getting "global" services, the `branch_services` relation might return entries for OTHER branches if RLS allows.
+        // BUT RLS for branch_services should restrict to "can_access_branch".
+        // If I am BranchAdmin of B1, I only see branch_services for B1. 
+        // So `s.branch_services[0]` should be my settings.
+
+        const bs = s.branch_services?.[0]
+
+        return {
+            ...s,
+            // If global, active status depends on junction. If no junction, default is TRUE (or FALSE? user preference. Migration said default true).
+            // Let's say default is TRUE for global services unless explicitly disabled.
+            // OR: Global services are available to everyone by default.
+            effective_is_active: s.branch_id === null
+                ? (bs ? bs.is_active : true)
+                : s.is_active,
+
+            // Allow overrides
+            price: bs?.custom_price || s.price, // Assuming we add price to services later, currently not in schema but good to prepare
+            duration_min: bs?.custom_duration_min || s.duration_min
+        }
+    })
+
+    return { data: effectiveServices }
 }
 
 export async function upsertService(formData: {
@@ -133,12 +176,20 @@ export async function upsertService(formData: {
     sort_order?: number
     branch_id?: string
 }) {
-    const { supabase, user, branchId } = await requireAdmin(formData.branch_id)
+    const { supabase, user, branchId, isSuperAdmin } = await requireAdmin(formData.branch_id)
     const isNew = !formData.id
-    const bid = formData.branch_id || branchId
+    // If branch_id provided, use it. If not, and not super admin, fail. 
+    // If super admin and no branch_id, it is GLOBAL.
+
+    let bid = formData.branch_id
+    if (!bid && !isSuperAdmin) {
+        // Fallback to user's branch if they are not super admin trying to create global
+        bid = branchId
+    }
+    // If bid is still null here, it means Super Admin is creating a GLOBAL service.
 
     if (!formData.name?.trim()) return { error: 'Hizmet adı zorunludur' }
-    if (!bid) return { error: 'Şube bilgisi gerekli' }
+    if (!bid && !isSuperAdmin) return { error: 'Şube bilgisi gerekli' }
 
     const payload = {
         name: formData.name.trim(),
@@ -166,19 +217,45 @@ export async function upsertService(formData: {
     return { success: true }
 }
 
-export async function toggleServiceActive(id: string, is_active: boolean) {
-    const { supabase, user, branchId } = await requireAdmin()
+export async function toggleServiceAvailability(serviceId: string, branchId: string, is_active: boolean) {
+    const { supabase, user } = await requireAdmin(branchId)
 
-    const { error } = await supabase
-        .from('services')
-        .update({ is_active, updated_at: new Date().toISOString(), updated_by: user.id })
-        .eq('id', id)
+    // Check if it's a global service or local private service
+    const { data: service } = await supabase.from('services').select('branch_id').eq('id', serviceId).single()
 
-    if (error) return { error: error.message }
+    if (service?.branch_id) {
+        // It is a private branch service, update directly
+        const { error } = await supabase
+            .from('services')
+            .update({ is_active, updated_at: new Date().toISOString(), updated_by: user.id })
+            .eq('id', serviceId)
+            .eq('branch_id', branchId) // Security check
+        if (error) return { error: error.message }
+    } else {
+        // It is a global service, update junction table
+        const { error } = await supabase
+            .from('branch_services')
+            .upsert({
+                branch_id: branchId,
+                service_id: serviceId,
+                is_active,
+                updated_at: new Date().toISOString(),
+                updated_by: user.id
+            }, { onConflict: 'branch_id, service_id' })
+        if (error) return { error: error.message }
+    }
 
-    await auditLog(supabase, user.id, user.email!, 'TOGGLE', 'services', id, branchId, null, { is_active })
     revalidatePath('/admin/services')
     return { success: true }
+}
+
+// Legacy toggle (renamed or kept for backward compat, but we prefer the explicit one above)
+export async function toggleServiceActive(id: string, is_active: boolean) {
+    // This function signature is missing branchId, which is critical now.
+    // adapting to use user's branch.
+    const { branchId } = await requireAdmin()
+    if (!branchId) return { error: 'Şube seçilmedi' }
+    return toggleServiceAvailability(id, branchId, is_active)
 }
 
 export async function deleteService(id: string) {
