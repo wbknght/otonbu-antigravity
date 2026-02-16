@@ -3,23 +3,23 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { createJob, lookupCarByPlate } from '@/app/actions/jobs'
-import { VehicleClass, VEHICLE_CLASS_LABELS, Car } from '@/types'
+import { Service, VehicleClass, VEHICLE_CLASS_LABELS, Car } from '@/types'
 import { cn } from '@/lib/utils'
 import { useBranch } from '@/contexts/BranchContext'
 import { JobDetailsDrawer } from './JobDetailsDrawer'
 
 interface AddJobProps {
-    serviceTypes: { id: string; name: string }[]
+    services: Service[]
 }
 
 const VEHICLE_CLASSES: VehicleClass[] = ['small', 'sedan', 'suv', 'van', 'pickup', 'luxury']
 
-export function AddJobButton({ serviceTypes }: AddJobProps) {
+export function AddJobButton({ services }: AddJobProps) {
     const { currentBranch } = useBranch()
     const [isOpen, setIsOpen] = useState(false)
     const [plate, setPlate] = useState('')
     const [vehicleClass, setVehicleClass] = useState<VehicleClass | null>(null)
-    const [serviceId, setServiceId] = useState(serviceTypes[0]?.id || '')
+    const [serviceId, setServiceId] = useState(services[0]?.id || '')
     const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -60,7 +60,7 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
     function resetForm() {
         setPlate('')
         setVehicleClass(null)
-        setServiceId(serviceTypes[0]?.id || '')
+        setServiceId(services[0]?.id || '')
         setPhone('')
         setError(null)
         setPrefilled(false)
@@ -184,8 +184,10 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
                                     onChange={e => setServiceId(e.target.value)}
                                     className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 h-12 text-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
-                                    {serviceTypes.map(st => (
-                                        <option key={st.id} value={st.id}>{st.name}</option>
+                                    {services.map(st => (
+                                        <option key={st.id} value={st.id}>
+                                            {st.name} {st.price > 0 && `(₺${st.price})`}
+                                        </option>
                                     ))}
                                 </select>
                             </div>

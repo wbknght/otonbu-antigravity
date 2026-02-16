@@ -41,7 +41,7 @@ export async function getJobs(branchId?: string) {
         .from('jobs')
         .select(`
             *,
-            service_types ( name, price ),
+            services ( name ),
             cars ( id, plate_number, vehicle_class, make, model, color, has_damage ),
             customers ( id, name, phone )
         `)
@@ -87,7 +87,7 @@ export async function getArchivedJobs(search?: string) {
         .from('jobs')
         .select(`
             *,
-            service_types ( name, price ),
+            services ( name ),
             cars ( id, plate_number, vehicle_class, make, model, color, has_damage ),
             customers ( id, name, phone )
         `, { count: 'exact' })
@@ -109,10 +109,44 @@ export async function getArchivedJobs(search?: string) {
     return { data: data as unknown as Job[], count: count || 0 }
 }
 
-export async function getServiceTypes() {
-    const supabase = await createClient()
-    const { data } = await supabase.from('service_types').select('id, name, price')
-    return data || []
+export async function getAvailableServices(branchId?: string) {
+    const { supabase, branchId: myBranch } = await getStaffSession()
+    const bid = branchId || myBranch
+
+    // Fetch universal + branch specific services
+    let query = supabase.from('services')
+        .select(`
+            *,
+            branch_services (
+                is_active,
+                custom_price,
+                custom_duration_min
+            )
+        `)
+        .or(`branch_id.is.null,branch_id.eq.${bid}`)
+        .order('sort_order', { ascending: true })
+        .order('name', { ascending: true })
+
+    const { data: services, error } = await query
+    if (error) return []
+
+    // Transform logic similar to admin.ts but geared for usage (filtering inactive)
+    const available = services.map((s: any) => {
+        const bs = s.branch_services?.[0]
+        const isActive = s.branch_id === null
+            ? (bs ? bs.is_active : true)
+            : s.is_active
+
+        return {
+            id: s.id,
+            name: s.name,
+            price: bs?.custom_price || s.price || 0,
+            duration_min: bs?.custom_duration_min || s.duration_min,
+            is_active: isActive
+        }
+    }).filter((s: any) => s.is_active)
+
+    return available
 }
 
 // ─── Car & Customer Lookup ───
@@ -166,7 +200,7 @@ export async function lookupCustomerByPhone(phone: string) {
 
 export async function createJob(
     plateNumber: string,
-    serviceTypeId: string,
+    serviceId: string,
     vehicleClass: VehicleClass,
     phone?: string,
     branchIdOverride?: string,
@@ -175,7 +209,7 @@ export async function createJob(
     const branchId = isSuperAdmin ? (branchIdOverride || myBranch) : myBranch
     const plate = plateNumber.toUpperCase().trim()
 
-    if (!plate || !serviceTypeId || !vehicleClass) {
+    if (!plate || !serviceId || !vehicleClass) {
         return { error: 'Zorunlu alanlar eksik' }
     }
     if (!branchId) return { error: 'Şube bilgisi gerekli' }
@@ -249,7 +283,7 @@ export async function createJob(
         .from('jobs')
         .insert([{
             plate_number: plate,
-            service_type_id: serviceTypeId,
+            service_id: serviceId,
             status: 'queue',
             car_id: carId,
             customer_id: customerId,

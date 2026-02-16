@@ -27,6 +27,20 @@ export const ROLE_HIERARCHY: Record<StaffRole, number> = {
     staff: 1,
 }
 
+export interface Service {
+    id: string
+    name: string
+    description?: string | null
+    duration_min: number
+    price: number
+    branch_id?: string | null
+    is_active: boolean
+    sort_order?: number
+    // Computed for UI
+    effective_is_active?: boolean
+    is_global?: boolean
+}
+
 export interface Branch {
     id: string
     name: string
@@ -93,9 +107,9 @@ export interface Job {
     completed_at: string | null
     created_at: string
     closed_at: string | null
-    service_types?: {
+    services?: {
         name: string
-        price: number
+        price?: number
     }
     cars?: Car
     customers?: Customer
@@ -128,9 +142,9 @@ export interface Appointment {
     converted_job_id: string | null
     is_valet: boolean
     valet_address: string | null
-    service_types?: {
+    services?: {
         name: string
-        price: number
+        price?: number
     }
 }
 
