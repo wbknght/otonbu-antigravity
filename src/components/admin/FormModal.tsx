@@ -8,7 +8,7 @@ import { tr } from '@/lib/i18n/tr'
 interface FormField {
     key: string
     label: string
-    type: 'text' | 'number' | 'textarea' | 'checkbox' | 'select'
+    type: 'text' | 'number' | 'textarea' | 'checkbox' | 'select' | 'password'
     required?: boolean
     placeholder?: string
     options?: { value: string; label: string }[]

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/server-admin'
 import { revalidatePath } from 'next/cache'
 import { StaffRole } from '@/types'
 
@@ -553,8 +554,9 @@ export async function upsertStaffProfile(formData: {
     role: string
     is_active?: boolean
     branch_id?: string
+    password?: string
 }) {
-    const { supabase, user, branchId, isSuperAdmin } = await requireAdmin(formData.branch_id)
+    const { supabase, user, branchId, isSuperAdmin, role: callerRole } = await requireAdmin(formData.branch_id)
     const isNew = !formData.id
     const bid = formData.branch_id || branchId
 
@@ -562,9 +564,48 @@ export async function upsertStaffProfile(formData: {
         return { error: 'E-posta ve ad soyad zorunludur' }
     }
 
-    // Only super_admin can create super_admin or branch_admin outside their branch
+    // Password required for new staff
+    if (isNew && !formData.password?.trim()) {
+        return { error: 'Yeni personel için şifre zorunludur' }
+    }
+
+    // Role permission checks
     if (formData.role === 'super_admin' && !isSuperAdmin) {
         return { error: 'Sadece süper admin bu rolü atayabilir' }
+    }
+    if (formData.role === 'branch_admin' && !isSuperAdmin) {
+        return { error: 'Sadece süper admin şube yöneticisi atayabilir' }
+    }
+    if (callerRole === 'manager' && !['staff', 'manager'].includes(formData.role)) {
+        return { error: 'Yöneticiler sadece personel ve yönetici ekleyebilir' }
+    }
+
+    let authUserId: string | undefined
+
+    // Create auth user for new staff members
+    if (isNew) {
+        try {
+            const adminClient = createAdminClient()
+            const { data: authUser, error: authError } = await adminClient.auth.admin.createUser({
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password!,
+                email_confirm: true,
+                user_metadata: {
+                    full_name: formData.full_name.trim(),
+                },
+            })
+
+            if (authError) {
+                if (authError.message?.includes('already been registered')) {
+                    return { error: 'Bu e-posta adresi zaten kayıtlı' }
+                }
+                return { error: `Kullanıcı oluşturulamadı: ${authError.message}` }
+            }
+
+            authUserId = authUser.user.id
+        } catch (err: any) {
+            return { error: `Kullanıcı oluşturulamadı: ${err.message}` }
+        }
     }
 
     const payload = {
@@ -577,6 +618,7 @@ export async function upsertStaffProfile(formData: {
         updated_at: new Date().toISOString(),
         updated_by: user.id,
         ...(isNew ? { created_by: user.id } : {}),
+        ...(authUserId ? { user_id: authUserId } : {}),
     }
 
     let result

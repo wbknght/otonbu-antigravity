@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
 import { upsertStaffProfile, toggleStaffActive } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface StaffProfile {
     id: string
@@ -17,22 +18,6 @@ interface StaffProfile {
     user_id: string | null
 }
 
-const staffFields = [
-    { key: 'full_name', label: tr.staff.name, type: 'text' as const, required: true, placeholder: 'Ahmet Yılmaz' },
-    { key: 'email', label: tr.staff.email, type: 'text' as const, required: true, placeholder: 'ahmet@ornek.com' },
-    { key: 'phone', label: tr.staff.phone, type: 'text' as const, placeholder: '0532 xxx xx xx' },
-    {
-        key: 'role', label: tr.staff.role, type: 'select' as const,
-        options: [
-            { value: 'staff', label: tr.staff.roles.staff },
-            { value: 'manager', label: tr.staff.roles.manager },
-            { value: 'branch_admin', label: tr.staff.roles.branch_admin },
-            { value: 'super_admin', label: tr.staff.roles.super_admin },
-        ],
-    },
-    { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
-]
-
 const roleBadgeColors: Record<string, string> = {
     super_admin: 'bg-purple-900/30 text-purple-400',
     branch_admin: 'bg-red-900/30 text-red-400',
@@ -40,11 +25,44 @@ const roleBadgeColors: Record<string, string> = {
     staff: 'bg-blue-900/30 text-blue-400',
 }
 
+function getStaffFields(isEditing: boolean, callerRole: string | null) {
+    // Role options based on caller's role
+    const allRoles = [
+        { value: 'staff', label: tr.staff.roles.staff },
+        { value: 'manager', label: tr.staff.roles.manager },
+        { value: 'branch_admin', label: tr.staff.roles.branch_admin },
+        { value: 'super_admin', label: tr.staff.roles.super_admin },
+    ]
+
+    const roleOptions = callerRole === 'super_admin'
+        ? allRoles
+        : callerRole === 'branch_admin'
+            ? allRoles.filter(r => ['staff', 'manager', 'branch_admin'].includes(r.value))
+            : allRoles.filter(r => ['staff', 'manager'].includes(r.value))
+
+    const fields = [
+        { key: 'full_name', label: tr.staff.name, type: 'text' as const, required: true, placeholder: 'Ahmet Yılmaz' },
+        { key: 'email', label: tr.staff.email, type: 'text' as const, required: true, placeholder: 'ahmet@ornek.com' },
+        ...(!isEditing ? [
+            { key: 'password', label: 'Şifre', type: 'password' as const, required: true, placeholder: 'Giriş şifresi' },
+        ] : []),
+        { key: 'phone', label: tr.staff.phone, type: 'text' as const, placeholder: '0532 xxx xx xx' },
+        {
+            key: 'role', label: tr.staff.role, type: 'select' as const,
+            options: roleOptions,
+        },
+        { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
+    ]
+
+    return fields
+}
+
 export function StaffClient({ initialStaff }: { initialStaff: StaffProfile[] }) {
     const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
+    const { userRole } = useBranch()
 
     const filtered = initialStaff.filter(s =>
         s.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -139,7 +157,7 @@ export function StaffClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={editing ? tr.staff.edit : tr.staff.addNew}
-                fields={staffFields}
+                fields={getStaffFields(!!editing, userRole)}
                 initialData={editing || { role: 'staff', is_active: true }}
                 onSubmit={async (data) => upsertStaffProfile({
                     id: editing?.id,
@@ -148,6 +166,7 @@ export function StaffClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
                     phone: data.phone,
                     role: data.role,
                     is_active: data.is_active,
+                    password: data.password,
                 })}
             />
         </div>
