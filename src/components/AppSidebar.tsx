@@ -20,7 +20,7 @@ import { useBranch } from '@/contexts/BranchContext'
 import { ROLE_LABELS } from '@/types'
 
 const navigation = [
-    { name: 'Panel', href: '/dashboard', icon: Home },
+    { name: 'Panel', href: '/dashboard', icon: Home, exact: true },
     { name: 'Geçmiş', href: '/dashboard/history', icon: History },
     { name: 'Randevular', href: '/dashboard/schedule', icon: Calendar },
     { name: 'Yönetim', href: '/admin', icon: Settings },
@@ -114,7 +114,11 @@ export function AppSidebar() {
                         {navigation.map((item) => {
                             // Hide admin link if user lacks admin role
                             if (item.href === '/admin' && !canAccessAdmin) return null
-                            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+                            // @ts-ignore
+                            const active = item.exact
+                                ? pathname === item.href
+                                : (pathname === item.href || pathname?.startsWith(item.href + '/'))
+
                             return (
                                 <Link
                                     key={item.name}
@@ -122,7 +126,7 @@ export function AppSidebar() {
                                     className={cn(
                                         'group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all',
                                         'min-h-[48px]', // Apple HIG touch target
-                                        isActive
+                                        active
                                             ? 'bg-blue-600/20 text-white border border-blue-500/30'
                                             : 'text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700'
                                     )}
@@ -130,7 +134,7 @@ export function AppSidebar() {
                                     <item.icon
                                         className={cn(
                                             'mr-3 h-5 w-5 flex-shrink-0',
-                                            isActive ? 'text-blue-500' : 'text-zinc-500 group-hover:text-white'
+                                            active ? 'text-blue-500' : 'text-zinc-500 group-hover:text-white'
                                         )}
                                     />
                                     {item.name}
