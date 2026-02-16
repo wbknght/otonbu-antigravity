@@ -42,8 +42,8 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
             const result = await lookupCarByPlate(plate)
             if (result?.car) {
                 setVehicleClass(result.car.vehicle_class)
-                if (result.customer?.phone) {
-                    setPhone(result.customer.phone)
+                if (result.lastCustomer?.phone) {
+                    setPhone(result.lastCustomer.phone)
                 }
                 setPrefilled(true)
             } else {

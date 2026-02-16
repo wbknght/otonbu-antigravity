@@ -1,15 +1,18 @@
 import { redirect } from 'next/navigation'
-import { AppSidebar } from '@/components/AppSidebar'
+import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { BranchProvider } from '@/contexts/BranchContext'
 import { getSessionContext } from '@/lib/session'
 
-export default async function DashboardLayout({
+export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const session = await getSessionContext()
     if (!session) redirect('/login')
+    if (!['super_admin', 'branch_admin', 'manager'].includes(session.role)) {
+        redirect('/dashboard')
+    }
 
     return (
         <BranchProvider
@@ -20,9 +23,8 @@ export default async function DashboardLayout({
             allBranches={session.allBranches}
         >
             <div className="flex h-screen bg-zinc-950">
-                <AppSidebar />
-                {/* pt-14 on mobile to account for the fixed top bar, lg:pt-0 since sidebar is static */}
-                <main className="flex-1 overflow-y-auto p-4 pt-[72px] lg:p-8 lg:pt-8 text-zinc-100">
+                <AdminSidebar />
+                <main className="flex-1 overflow-y-auto p-8 text-zinc-100">
                     {children}
                 </main>
             </div>

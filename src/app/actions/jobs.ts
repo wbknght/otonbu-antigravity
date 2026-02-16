@@ -2,14 +2,42 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Job, JobStatus, VehicleClass } from '@/types'
+import { Job, JobStatus, VehicleClass, StaffRole } from '@/types'
+
+// ─── Session helper ───
+
+async function getStaffSession() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Oturum açmanız gerekiyor')
+
+    const { data: staff } = await supabase
+        .from('staff_profiles')
+        .select('role, branch_id, full_name')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+    if (!staff) throw new Error('Personel profili bulunamadı')
+
+    return {
+        supabase,
+        userId: user.id,
+        email: user.email || '',
+        role: staff.role as StaffRole,
+        branchId: staff.branch_id as string,
+        fullName: staff.full_name,
+        isSuperAdmin: staff.role === 'super_admin',
+    }
+}
 
 // ─── Queries ───
 
-export async function getJobs() {
-    const supabase = await createClient()
+export async function getJobs(branchId?: string) {
+    const { supabase, branchId: myBranch, isSuperAdmin } = await getStaffSession()
+    const bid = branchId || myBranch
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('jobs')
         .select(`
             *,
@@ -18,115 +46,149 @@ export async function getJobs() {
             customers ( id, name, phone )
         `)
         .is('closed_at', null)
-        .order('created_at', { ascending: true })
+    if (bid) query = query.eq('branch_id', bid)
+    query = query.order('created_at', { ascending: true })
+
+    const { data, error } = await query
 
     if (error) {
         console.error('Error fetching jobs:', error)
         return []
     }
 
-    return data as unknown as Job[]
+    // Enrich with assigned staff name
+    const jobs = data as unknown as Job[]
+    if (jobs.length > 0) {
+        const assignedIds = [...new Set(jobs.filter(j => j.assigned_to).map(j => j.assigned_to!))]
+        if (assignedIds.length > 0) {
+            const { data: staffData } = await supabase
+                .from('staff_profiles')
+                .select('user_id, full_name, email')
+                .in('user_id', assignedIds)
+
+            if (staffData) {
+                const staffMap = new Map(staffData.map(s => [s.user_id, { full_name: s.full_name, email: s.email }]))
+                jobs.forEach(job => {
+                    if (job.assigned_to && staffMap.has(job.assigned_to)) {
+                        job.assigned_staff = staffMap.get(job.assigned_to) || null
+                    }
+                })
+            }
+        }
+    }
+
+    return jobs
 }
 
 export async function getArchivedJobs(search?: string) {
-    const supabase = await createClient()
+    const { supabase, branchId } = await getStaffSession()
 
     let query = supabase
         .from('jobs')
         .select(`
             *,
             service_types ( name, price ),
-            cars ( id, plate_number, vehicle_class, make, model, color )
-        `)
+            cars ( id, plate_number, vehicle_class, make, model, color, has_damage ),
+            customers ( id, name, phone )
+        `, { count: 'exact' })
         .not('closed_at', 'is', null)
-        .order('closed_at', { ascending: false })
-        .limit(50)
 
-    if (search) {
-        query = query.ilike('plate_number', `%${search}%`)
+    if (branchId) query = query.eq('branch_id', branchId)
+
+    if (search?.trim()) {
+        query = query.ilike('plate_number', `%${search.trim().toUpperCase()}%`)
     }
 
-    const { data, error } = await query
+    query = query.order('closed_at', { ascending: false }).limit(50)
 
+    const { data, error, count } = await query
     if (error) {
         console.error('Error fetching archived jobs:', error)
-        return []
+        return { data: [], count: 0 }
     }
-
-    return data as unknown as Job[]
+    return { data: data as unknown as Job[], count: count || 0 }
 }
 
 export async function getServiceTypes() {
     const supabase = await createClient()
-    const { data } = await supabase.from('service_types').select('*').eq('is_active', true)
+    const { data } = await supabase.from('service_types').select('id, name, price')
     return data || []
 }
 
 // ─── Car & Customer Lookup ───
 
 export async function lookupCarByPlate(plate: string) {
-    const supabase = await createClient()
-    const { data: car } = await supabase
+    const { supabase, branchId } = await getStaffSession()
+    const upperPlate = plate.toUpperCase().trim()
+    if (!upperPlate) return null
+
+    let query = supabase
         .from('cars')
         .select('*')
-        .eq('plate_number', plate.toUpperCase())
-        .single()
+        .eq('plate_number', upperPlate)
+    if (branchId) query = query.eq('branch_id', branchId)
+    const { data } = await query.single()
 
-    if (!car) return null
+    if (!data) return null
 
-    // Find the most recent customer linked to a job with this car
-    const { data: recentJob } = await supabase
+    // Get last customer
+    const { data: prevJob } = await supabase
         .from('jobs')
-        .select('customer_id, customers ( * )')
-        .eq('car_id', car.id)
+        .select('customer_id, customers ( id, name, phone, email )')
+        .eq('car_id', data.id)
         .not('customer_id', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1)
         .single()
 
+    const rawCustomer = prevJob?.customers
+    const lastCustomer = Array.isArray(rawCustomer) ? rawCustomer[0] : rawCustomer
+
     return {
-        car,
-        customer: (recentJob as any)?.customers || null,
+        car: data,
+        lastCustomer: lastCustomer || null,
     }
 }
 
 export async function lookupCustomerByPhone(phone: string) {
-    const supabase = await createClient()
-    const { data } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('phone', phone)
-        .single()
+    const { supabase, branchId } = await getStaffSession()
+    const clean = phone.trim()
+    if (!clean) return null
+
+    let query = supabase.from('customers').select('*').eq('phone', clean)
+    if (branchId) query = query.eq('branch_id', branchId)
+    const { data } = await query.single()
+
     return data
 }
 
-// ─── Job Creation (Step 1) ───
+// ─── Job Creation ───
 
 export async function createJob(
     plateNumber: string,
     serviceTypeId: string,
     vehicleClass: VehicleClass,
-    phone?: string
+    phone?: string,
+    branchIdOverride?: string,
 ) {
-    const supabase = await createClient()
+    const { supabase, userId, branchId: myBranch, isSuperAdmin } = await getStaffSession()
+    const branchId = isSuperAdmin ? (branchIdOverride || myBranch) : myBranch
     const plate = plateNumber.toUpperCase().trim()
 
     if (!plate || !serviceTypeId || !vehicleClass) {
         return { error: 'Zorunlu alanlar eksik' }
     }
+    if (!branchId) return { error: 'Şube bilgisi gerekli' }
 
-    // 1. Upsert car
-    const { data: existingCar } = await supabase
-        .from('cars')
-        .select('id')
-        .eq('plate_number', plate)
-        .single()
+    // 1. Upsert car (branch-scoped)
+    let query = supabase.from('cars').select('id').eq('plate_number', plate)
+    query = query.eq('branch_id', branchId)
+    const { data: existingCar } = await query.single()
 
     let carId: string
 
     if (existingCar) {
         carId = existingCar.id
-        // Update vehicle class if changed
         await supabase
             .from('cars')
             .update({ vehicle_class: vehicleClass, updated_at: new Date().toISOString() })
@@ -134,7 +196,7 @@ export async function createJob(
     } else {
         const { data: newCar, error: carError } = await supabase
             .from('cars')
-            .insert([{ plate_number: plate, vehicle_class: vehicleClass }])
+            .insert([{ plate_number: plate, vehicle_class: vehicleClass, branch_id: branchId }])
             .select('id')
             .single()
 
@@ -145,23 +207,21 @@ export async function createJob(
         carId = newCar.id
     }
 
-    // 2. Resolve customer
+    // 2. Resolve customer (branch-scoped)
     let customerId: string | null = null
 
     if (phone?.trim()) {
         const cleanPhone = phone.trim()
-        const { data: existingCustomer } = await supabase
-            .from('customers')
-            .select('id')
-            .eq('phone', cleanPhone)
-            .single()
+        let custQuery = supabase.from('customers').select('id').eq('phone', cleanPhone)
+        custQuery = custQuery.eq('branch_id', branchId)
+        const { data: existingCustomer } = await custQuery.single()
 
         if (existingCustomer) {
             customerId = existingCustomer.id
         } else {
             const { data: newCustomer, error: custError } = await supabase
                 .from('customers')
-                .insert([{ phone: cleanPhone }])
+                .insert([{ phone: cleanPhone, branch_id: branchId }])
                 .select('id')
                 .single()
 
@@ -170,7 +230,6 @@ export async function createJob(
             }
         }
     } else if (existingCar) {
-        // No phone provided but car exists — carry over previous customer
         const { data: prevJob } = await supabase
             .from('jobs')
             .select('customer_id')
@@ -185,7 +244,7 @@ export async function createJob(
         }
     }
 
-    // 3. Create job
+    // 3. Create job with branch_id
     const { data: job, error: jobError } = await supabase
         .from('jobs')
         .insert([{
@@ -194,6 +253,7 @@ export async function createJob(
             status: 'queue',
             car_id: carId,
             customer_id: customerId,
+            branch_id: branchId,
         }])
         .select(`
             *,
@@ -214,7 +274,7 @@ export async function createJob(
     return { success: true, job }
 }
 
-// ─── Car Details Update (Step 2) ───
+// ─── Car Details Update ───
 
 export async function updateCarDetails(
     carId: string,
@@ -226,15 +286,18 @@ export async function updateCarDetails(
         has_damage?: boolean
     }
 ) {
-    const supabase = await createClient()
+    const { supabase } = await getStaffSession()
 
     const { error } = await supabase
         .from('cars')
-        .update({ ...details, updated_at: new Date().toISOString() })
+        .update({
+            ...details,
+            updated_at: new Date().toISOString(),
+        })
         .eq('id', carId)
 
     if (error) {
-        console.error('Error updating car details:', error)
+        console.error('Error updating car:', error)
         return { error: 'Araç bilgileri güncellenemedi' }
     }
 
@@ -242,15 +305,14 @@ export async function updateCarDetails(
     return { success: true }
 }
 
-// ─── Customer Update (Step 2) ───
+// ─── Customer Update ───
 
 export async function updateJobCustomer(
     jobId: string,
     customerData: { name?: string; email?: string; phone?: string }
 ) {
-    const supabase = await createClient()
+    const { supabase, branchId } = await getStaffSession()
 
-    // Get job to find existing customer
     const { data: job } = await supabase
         .from('jobs')
         .select('customer_id')
@@ -259,36 +321,26 @@ export async function updateJobCustomer(
 
     if (!job) return { error: 'İş bulunamadı' }
 
-    let customerId = job.customer_id
-
-    if (customerId) {
-        // Update existing customer
+    if (job.customer_id) {
         const { error } = await supabase
             .from('customers')
             .update(customerData)
-            .eq('id', customerId)
+            .eq('id', job.customer_id)
 
-        if (error) {
-            console.error('Error updating customer:', error)
-            return { error: 'Müşteri bilgileri güncellenemedi' }
-        }
-    } else if (customerData.phone || customerData.name || customerData.email) {
-        // Create new customer and link
-        const { data: newCustomer, error: custError } = await supabase
+        if (error) return { error: 'Müşteri bilgileri güncellenemedi' }
+    } else if (customerData.phone) {
+        // Create new customer
+        const { data: newCustomer, error } = await supabase
             .from('customers')
-            .insert([customerData])
+            .insert([{ ...customerData, branch_id: branchId }])
             .select('id')
             .single()
 
-        if (custError || !newCustomer) {
-            console.error('Error creating customer:', custError)
-            return { error: 'Müşteri kaydı oluşturulamadı' }
-        }
+        if (error || !newCustomer) return { error: 'Müşteri oluşturulamadı' }
 
-        customerId = newCustomer.id
         await supabase
             .from('jobs')
-            .update({ customer_id: customerId })
+            .update({ customer_id: newCustomer.id })
             .eq('id', jobId)
     }
 
@@ -296,14 +348,41 @@ export async function updateJobCustomer(
     return { success: true }
 }
 
-// ─── Status & Payment ───
+// ─── Status & Assignment ───
 
 export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
-    const supabase = await createClient()
+    const { supabase, userId, email, role, branchId } = await getStaffSession()
+
+    // Get current job
+    const { data: currentJob } = await supabase
+        .from('jobs')
+        .select('status, assigned_to, branch_id')
+        .eq('id', jobId)
+        .single()
+
+    if (!currentJob) throw new Error('İş bulunamadı')
+
+    // Permission check
+    const isAssigned = currentJob.assigned_to === userId
+    const canMove = role === 'super_admin' || role === 'branch_admin' || role === 'manager' || (role === 'staff' && isAssigned)
+
+    if (!canMove) {
+        throw new Error('Bu işlemi yapmak için yetkiniz yok')
+    }
+
+    const updates: any = { status: newStatus }
+
+    // Set timestamps based on status
+    if (newStatus === 'washing' && !currentJob.status || currentJob.status === 'queue') {
+        updates.started_at = new Date().toISOString()
+    }
+    if (newStatus === 'completed') {
+        updates.completed_at = new Date().toISOString()
+    }
 
     const { error } = await supabase
         .from('jobs')
-        .update({ status: newStatus })
+        .update(updates)
         .eq('id', jobId)
 
     if (error) {
@@ -311,11 +390,114 @@ export async function updateJobStatus(jobId: string, newStatus: JobStatus) {
         throw new Error('İş durumu güncellenemedi')
     }
 
+    // Record status history
+    await supabase.from('job_status_history').insert([{
+        job_id: jobId,
+        branch_id: currentJob.branch_id,
+        from_status: currentJob.status,
+        to_status: newStatus,
+        actor_user_id: userId,
+        actor_email: email,
+    }])
+
     revalidatePath('/dashboard')
 }
 
+export async function claimJob(jobId: string) {
+    const { supabase, userId, email, branchId, role } = await getStaffSession()
+
+    // Use atomic claim function
+    const { data: claimed, error } = await supabase.rpc('claim_job', {
+        p_job_id: jobId,
+        p_user_id: userId,
+    })
+
+    if (error) {
+        console.error('Error claiming job:', error)
+        return { error: 'İş alınamadı' }
+    }
+
+    if (!claimed) {
+        return { error: 'Bu iş zaten başka birine atanmış veya sırada değil' }
+    }
+
+    // Record in status history
+    await supabase.from('job_status_history').insert([{
+        job_id: jobId,
+        branch_id: branchId,
+        from_status: null,
+        to_status: 'claimed',
+        actor_user_id: userId,
+        actor_email: email,
+    }])
+
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+
+export async function reassignJob(jobId: string, targetUserId: string) {
+    const { supabase, userId, email, role, branchId } = await getStaffSession()
+
+    // Only managers+ can reassign
+    if (!['super_admin', 'branch_admin', 'manager'].includes(role)) {
+        return { error: 'Yetkiniz yok' }
+    }
+
+    const { error } = await supabase
+        .from('jobs')
+        .update({
+            assigned_to: targetUserId,
+            assigned_by: userId,
+            assigned_at: new Date().toISOString(),
+        })
+        .eq('id', jobId)
+
+    if (error) {
+        console.error('Error reassigning job:', error)
+        return { error: 'İş atanamadı' }
+    }
+
+    await supabase.from('job_status_history').insert([{
+        job_id: jobId,
+        branch_id: branchId,
+        from_status: null,
+        to_status: 'reassigned',
+        actor_user_id: userId,
+        actor_email: email,
+    }])
+
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+
+// ─── Get branch staff for assignment dropdown ───
+
+export async function getBranchStaff() {
+    const { supabase, branchId, isSuperAdmin } = await getStaffSession()
+
+    let query = supabase
+        .from('staff_profiles')
+        .select('user_id, full_name, email, role')
+        .eq('is_active', true)
+
+    if (!isSuperAdmin && branchId) {
+        query = query.eq('branch_id', branchId)
+    }
+
+    query = query.order('full_name', { ascending: true })
+    const { data, error } = await query
+
+    if (error) {
+        console.error('Error fetching branch staff:', error)
+        return []
+    }
+    return data || []
+}
+
+// ─── Payment ───
+
 export async function recordPayment(jobId: string, amount: number, method: 'cash' | 'card' | 'transfer') {
-    const supabase = await createClient()
+    const { supabase, userId } = await getStaffSession()
 
     const { error: paymentError } = await supabase
         .from('payments')
@@ -323,7 +505,7 @@ export async function recordPayment(jobId: string, amount: number, method: 'cash
             job_id: jobId,
             amount,
             method,
-            recorded_by: (await supabase.auth.getUser()).data.user?.id
+            recorded_by: userId,
         }])
 
     if (paymentError) {
@@ -346,7 +528,7 @@ export async function recordPayment(jobId: string, amount: number, method: 'cash
 }
 
 export async function archiveJob(jobId: string) {
-    const supabase = await createClient()
+    const { supabase } = await getStaffSession()
 
     const { error } = await supabase
         .from('jobs')

@@ -15,6 +15,9 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlobalSearch } from './GlobalSearch'
+import { BranchSwitcher } from './BranchSwitcher'
+import { useBranch } from '@/contexts/BranchContext'
+import { ROLE_LABELS } from '@/types'
 
 const navigation = [
     { name: 'Panel', href: '/dashboard', icon: Home },
@@ -26,6 +29,8 @@ const navigation = [
 export function AppSidebar() {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
+    const { userRole } = useBranch()
+    const canAccessAdmin = userRole && ['super_admin', 'branch_admin', 'manager'].includes(userRole)
 
     // Close sidebar on route change (tablet nav)
     useEffect(() => {
@@ -98,10 +103,17 @@ export function AppSidebar() {
                     <GlobalSearch />
                 </div>
 
+                {/* Branch Switcher */}
+                <div className="px-4 mb-2">
+                    <BranchSwitcher />
+                </div>
+
                 {/* Navigation */}
                 <div className="flex-1 overflow-y-auto py-4">
                     <nav className="space-y-1 px-3">
                         {navigation.map((item) => {
+                            // Hide admin link if user lacks admin role
+                            if (item.href === '/admin' && !canAccessAdmin) return null
                             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
                             return (
                                 <Link
@@ -128,8 +140,15 @@ export function AppSidebar() {
                     </nav>
                 </div>
 
-                {/* Sign Out */}
-                <div className="border-t border-zinc-800 p-4">
+                {/* User info + Sign Out */}
+                <div className="border-t border-zinc-800 p-4 space-y-2">
+                    {userRole && (
+                        <div className="px-4 py-1">
+                            <span className="text-xs font-medium px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
+                                {ROLE_LABELS[userRole]}
+                            </span>
+                        </div>
+                    )}
                     <button className="group flex w-full items-center rounded-xl px-4 py-3.5 text-base font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700 min-h-[48px]">
                         <LogOut className="mr-3 h-5 w-5 text-zinc-500 group-hover:text-white" />
                         Çıkış Yap

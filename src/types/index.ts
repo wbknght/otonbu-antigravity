@@ -2,6 +2,8 @@ export type JobStatus = 'queue' | 'washing' | 'drying' | 'completed'
 
 export type VehicleClass = 'small' | 'sedan' | 'suv' | 'van' | 'pickup' | 'luxury'
 
+export type StaffRole = 'super_admin' | 'branch_admin' | 'manager' | 'staff'
+
 export const VEHICLE_CLASS_LABELS: Record<VehicleClass, string> = {
     small: 'Küçük',
     sedan: 'Sedan',
@@ -9,6 +11,45 @@ export const VEHICLE_CLASS_LABELS: Record<VehicleClass, string> = {
     van: 'Van',
     pickup: 'Pikap',
     luxury: 'Lüks',
+}
+
+export const ROLE_LABELS: Record<StaffRole, string> = {
+    super_admin: 'Süper Admin',
+    branch_admin: 'Şube Admini',
+    manager: 'Yönetici',
+    staff: 'Personel',
+}
+
+export const ROLE_HIERARCHY: Record<StaffRole, number> = {
+    super_admin: 4,
+    branch_admin: 3,
+    manager: 2,
+    staff: 1,
+}
+
+export interface Branch {
+    id: string
+    name: string
+    address: string | null
+    timezone: string
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface StaffProfile {
+    id: string
+    user_id: string | null
+    email: string
+    full_name: string
+    phone: string | null
+    role: StaffRole
+    branch_id: string | null
+    is_active: boolean
+    created_at: string
+    updated_at: string
+    // Joined
+    branches?: Branch
 }
 
 export interface Car {
@@ -20,6 +61,7 @@ export interface Car {
     color: string | null
     notes: string | null
     has_damage: boolean
+    branch_id: string
     created_at: string
     updated_at: string
 }
@@ -30,6 +72,7 @@ export interface Customer {
     phone: string | null
     email: string | null
     sms_consent: boolean
+    branch_id: string
     created_at: string
 }
 
@@ -42,6 +85,12 @@ export interface Job {
     owner_id: string | null
     car_id: string | null
     customer_id: string | null
+    branch_id: string
+    assigned_to: string | null
+    assigned_by: string | null
+    assigned_at: string | null
+    started_at: string | null
+    completed_at: string | null
     created_at: string
     closed_at: string | null
     service_types?: {
@@ -50,6 +99,11 @@ export interface Job {
     }
     cars?: Car
     customers?: Customer
+    // Joined staff name for display
+    assigned_staff?: {
+        full_name: string
+        email: string
+    } | null
 }
 
 export type PaymentMethod = 'cash' | 'card' | 'transfer'
@@ -86,3 +140,14 @@ export const KANBAN_COLUMNS: { id: JobStatus; title: string }[] = [
     { id: 'drying', title: 'Kurulama' },
     { id: 'completed', title: 'Tamamlandı' },
 ]
+
+// Permission helper: can this role move a job status?
+export function canMoveStatus(role: StaffRole, isAssigned: boolean): boolean {
+    if (role === 'super_admin' || role === 'branch_admin' || role === 'manager') return true
+    return role === 'staff' && isAssigned
+}
+
+// Permission helper: can this role assign/reassign?
+export function canAssign(role: StaffRole): boolean {
+    return role === 'super_admin' || role === 'branch_admin' || role === 'manager'
+}

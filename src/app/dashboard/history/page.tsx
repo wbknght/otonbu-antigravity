@@ -11,7 +11,7 @@ export default async function HistoryPage({
 }) {
     const params = await searchParams
     const search = typeof params.search === 'string' ? params.search : undefined
-    const jobs = await getArchivedJobs(search)
+    const { data: jobs } = await getArchivedJobs(search)
 
     return (
         <div className="max-w-7xl mx-auto">
