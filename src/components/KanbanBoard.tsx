@@ -148,19 +148,9 @@ export function KanbanBoard({ initialJobs }: KanbanBoardProps) {
         )
     }
 
-    const hasJobs = jobs.length > 0
-
-    if (!hasJobs) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[60vh] text-zinc-500">
-                <div className="bg-zinc-900 p-8 rounded-full mb-4">
-                    <div className="w-16 h-16 border-4 border-zinc-800 border-t-blue-500 rounded-full animate-spin" />
-                </div>
-                <p>Loading board or no active jobs...</p>
-                <p className="text-xs mt-2 text-zinc-600">Create a job to get started.</p>
-            </div>
-        )
-    }
+    // If no jobs, we just render the board so users can drag new jobs in later or see the columns
+    // const hasJobs = jobs.length > 0
+    // Removed old spinner block
 
     return (
         <DndContext
