@@ -421,10 +421,14 @@ export async function claimJob(jobId: string) {
         return { error: 'Bu iş zaten başka birine atanmış veya sırada değil' }
     }
 
+    // Get job branch for history (super_admin might have null branchId)
+    const { data: job } = await supabase.from('jobs').select('branch_id').eq('id', jobId).single()
+
     // Record in status history
     await supabase.from('job_status_history').insert([{
         job_id: jobId,
-        branch_id: branchId,
+        // Use job branch if available, fallback to session branch (though session might be null for super_admin)
+        branch_id: job?.branch_id || branchId,
         from_status: null,
         to_status: 'claimed',
         actor_user_id: userId,
@@ -443,7 +447,7 @@ export async function reassignJob(jobId: string, targetUserId: string) {
         return { error: 'Yetkiniz yok' }
     }
 
-    const { error } = await supabase
+    const { data: updatedJob, error } = await supabase
         .from('jobs')
         .update({
             assigned_to: targetUserId,
@@ -451,6 +455,8 @@ export async function reassignJob(jobId: string, targetUserId: string) {
             assigned_at: new Date().toISOString(),
         })
         .eq('id', jobId)
+        .select('branch_id')
+        .single()
 
     if (error) {
         console.error('Error reassigning job:', error)
@@ -459,7 +465,7 @@ export async function reassignJob(jobId: string, targetUserId: string) {
 
     await supabase.from('job_status_history').insert([{
         job_id: jobId,
-        branch_id: branchId,
+        branch_id: updatedJob?.branch_id || branchId,
         from_status: null,
         to_status: 'reassigned',
         actor_user_id: userId,
@@ -497,12 +503,27 @@ export async function getBranchStaff() {
 // ─── Payment ───
 
 export async function recordPayment(jobId: string, amount: number, method: 'cash' | 'card' | 'transfer') {
-    const { supabase, userId } = await getStaffSession()
+    const { supabase, userId, branchId } = await getStaffSession()
+
+    // We need to ensure we have the branch_id. 
+    // If the user is super_admin, they might have specific branch context, 
+    // but for payments it's safer to use the job's branch_id to ensure consistency.
+    // However, for efficiency, since we are likely in the context of the job's branch, 
+    // checking the job's branch is best.
+
+    const { data: job } = await supabase
+        .from('jobs')
+        .select('branch_id')
+        .eq('id', jobId)
+        .single()
+
+    if (!job) return { error: 'İş bulunamadı' }
 
     const { error: paymentError } = await supabase
         .from('payments')
         .insert([{
             job_id: jobId,
+            branch_id: job.branch_id,
             amount,
             method,
             recorded_by: userId,
