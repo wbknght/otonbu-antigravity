@@ -5,6 +5,7 @@ import { Plus, Search } from 'lucide-react'
 import { createJob, lookupCarByPlate } from '@/app/actions/jobs'
 import { VehicleClass, VEHICLE_CLASS_LABELS, Car } from '@/types'
 import { cn } from '@/lib/utils'
+import { useBranch } from '@/contexts/BranchContext'
 import { JobDetailsDrawer } from './JobDetailsDrawer'
 
 interface AddJobProps {
@@ -14,6 +15,7 @@ interface AddJobProps {
 const VEHICLE_CLASSES: VehicleClass[] = ['small', 'sedan', 'suv', 'van', 'pickup', 'luxury']
 
 export function AddJobButton({ serviceTypes }: AddJobProps) {
+    const { currentBranch } = useBranch()
     const [isOpen, setIsOpen] = useState(false)
     const [plate, setPlate] = useState('')
     const [vehicleClass, setVehicleClass] = useState<VehicleClass | null>(null)
@@ -75,7 +77,13 @@ export function AddJobButton({ serviceTypes }: AddJobProps) {
         setLoading(true)
         setError(null)
 
-        const result = await createJob(plate, serviceId, vehicleClass, phone || undefined)
+        if (!currentBranch) {
+            setError('Şube seçilmedi')
+            setLoading(false)
+            return
+        }
+
+        const result = await createJob(plate, serviceId, vehicleClass, phone || undefined, currentBranch.id)
 
         setLoading(false)
 
