@@ -1,17 +1,16 @@
 -- Migration 009a: Schema Changes (run FIRST)
+-- branches table already created — this will skip via IF NOT EXISTS
 -- ═══════════════════════════════════════════
 
--- 1. BRANCHES TABLE
+-- 1. BRANCHES TABLE (already exists from test, but safe to re-run)
 CREATE TABLE IF NOT EXISTS branches (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL,
     address text,
     timezone text NOT NULL DEFAULT 'Europe/Istanbul',
     is_active boolean DEFAULT true,
     created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now(),
-    created_by uuid REFERENCES auth.users,
-    updated_by uuid REFERENCES auth.users
+    updated_at timestamptz DEFAULT now()
 );
 
 INSERT INTO branches (id, name, address) VALUES
@@ -49,7 +48,7 @@ ALTER TABLE jobs ALTER COLUMN branch_id SET NOT NULL;
 
 -- 4. JOB STATUS HISTORY
 CREATE TABLE IF NOT EXISTS job_status_history (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     job_id uuid NOT NULL REFERENCES jobs ON DELETE CASCADE,
     branch_id uuid NOT NULL REFERENCES branches,
     from_status text,
