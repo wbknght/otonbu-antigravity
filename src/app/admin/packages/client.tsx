@@ -7,6 +7,7 @@ import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog'
 import { upsertPackage, setPackageItems, togglePackageActive, deletePackage } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface Service {
     id: string
@@ -45,6 +46,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
     const [confirmDelete, setConfirmDelete] = useState<PackageData | null>(null)
     const [itemsEditing, setItemsEditing] = useState<PackageData | null>(null)
     const [selectedItems, setSelectedItems] = useState<{ service_id: string; is_base: boolean }[]>([])
+    const { currentBranch } = useBranch()
     const [isPending, startTransition] = useTransition()
 
     const filtered = initialPackages.filter(p => {
