@@ -1,12 +1,12 @@
 -- Migration 009b: Functions (run SECOND, after 009a succeeds)
 -- ═══════════════════════════════════════════════════════════
 
-DROP FUNCTION IF EXISTS public.staff_role();
-DROP FUNCTION IF EXISTS public.user_role();
-DROP FUNCTION IF EXISTS public.user_branch_id();
-DROP FUNCTION IF EXISTS public.is_super_admin();
-DROP FUNCTION IF EXISTS public.can_access_branch(uuid);
-DROP FUNCTION IF EXISTS public.claim_job(uuid, uuid);
+DROP FUNCTION IF EXISTS public.staff_role() CASCADE;
+DROP FUNCTION IF EXISTS public.user_role() CASCADE;
+DROP FUNCTION IF EXISTS public.user_branch_id() CASCADE;
+DROP FUNCTION IF EXISTS public.is_super_admin() CASCADE;
+DROP FUNCTION IF EXISTS public.can_access_branch(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.claim_job(uuid, uuid) CASCADE;
 
 CREATE OR REPLACE FUNCTION public.user_role()
 RETURNS text AS $$
