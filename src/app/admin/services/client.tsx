@@ -26,7 +26,6 @@ const serviceFields = [
     { key: 'duration_min', label: tr.services.duration, type: 'number' as const, placeholder: '30' },
     { key: 'sort_order', label: tr.common.sortOrder, type: 'number' as const, placeholder: '0' },
     { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
-    { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
 ]
 
 export function ServicesClient({ initialServices }: { initialServices: Service[] }) {
