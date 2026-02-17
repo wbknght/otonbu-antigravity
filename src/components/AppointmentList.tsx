@@ -89,7 +89,7 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                                 {apt.plate_number || '---'}
                             </span>
                         </div>
-                        <span className="text-zinc-500">{apt.service_types?.name}</span>
+                        <span className="text-zinc-500">{apt.services?.name}</span>
                     </div>
 
                     {apt.status === 'booked' && (

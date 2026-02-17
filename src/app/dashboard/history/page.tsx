@@ -53,10 +53,10 @@ export default async function HistoryPage({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {job.service_types?.name}
+                                            {job.services?.name}
                                         </td>
                                         <td className="px-6 py-4 font-mono">
-                                            ₺{job.service_types?.price}
+                                            ₺{job.services?.price}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
