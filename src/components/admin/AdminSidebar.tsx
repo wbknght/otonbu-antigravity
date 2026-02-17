@@ -20,14 +20,14 @@ import { BranchSwitcher } from '@/components/BranchSwitcher'
 import { useBranch } from '@/contexts/BranchContext'
 
 const adminNav = [
-    { name: tr.adminNav.services, href: '/admin/services', icon: Wrench },
-    { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car },
-    { name: tr.adminNav.packages, href: '/admin/packages', icon: Package },
-    { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign },
-    { name: tr.adminNav.staff, href: '/admin/staff', icon: Users },
-    { name: tr.adminNav.locations, href: '/admin/locations', icon: MapPin },
-    { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings },
-    { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList },
+    { name: tr.adminNav.services, href: '/admin/services', icon: Wrench, roles: ['super_admin'] },
+    { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin'] },
+    { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin'] },
+    { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin'] },
+    { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'branch_admin', 'manager'] },
+    { name: tr.adminNav.locations, href: '/admin/locations', icon: MapPin, roles: ['super_admin'] },
+    { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin'] },
+    { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin'] },
 ]
 
 export function AdminSidebar() {
@@ -50,6 +50,10 @@ export function AdminSidebar() {
             <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                 {adminNav.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+
+                    // Filter based on role
+                    if (!isSuperAdmin && !item.roles.includes('branch_admin')) return null
+
                     return (
                         <Link
                             key={item.href}
