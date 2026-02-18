@@ -56,10 +56,12 @@ export function PricingClient({
     initialPriceLists,
     packages,
     vehicleClasses,
+    branchId,
 }: {
     initialPriceLists: PriceList[]
     packages: Package[]
     vehicleClasses: VehicleClass[]
+    branchId?: string
 }) {
     const [listModalOpen, setListModalOpen] = useState(false)
     const [editingList, setEditingList] = useState<PriceList | null>(null)
@@ -71,6 +73,9 @@ export function PricingClient({
     const [confirmDeleteRule, setConfirmDeleteRule] = useState<PriceRule | null>(null)
     const { currentBranch } = useBranch()
     const [isPending, startTransition] = useTransition()
+
+    // Use URL branchId if available, otherwise fall back to context
+    const activeBranchId = branchId || currentBranch?.id
 
     // Rule form state
     const [rulePackageId, setRulePackageId] = useState('')
@@ -264,14 +269,14 @@ export function PricingClient({
                 fields={priceListFields}
                 initialData={editingList || { is_active: true }}
                 onSubmit={async (data) => {
-                    if (!currentBranch) return { error: 'Lütfen önce bir şube seçin' }
+                    if (!activeBranchId) return { error: 'Lütfen önce bir şube seçin' }
                     return upsertPriceList({
                         id: editingList?.id,
                         name: data.name,
                         valid_from: data.valid_from,
                         valid_to: data.valid_to,
                         is_active: data.is_active,
-                        branch_id: currentBranch.id,
+                        branch_id: activeBranchId,
                     })
                 }}
             />

@@ -61,12 +61,15 @@ function getStaffFields(isEditing: boolean, callerRole: string | null) {
     return fields
 }
 
-export function StaffClient({ initialStaff }: { initialStaff: StaffProfile[] }) {
+export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffProfile[], branchId?: string }) {
     const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
-    const { userRole } = useBranch()
+    const { userRole, currentBranch } = useBranch()
+
+    // Use URL branchId if available, otherwise fall back to context
+    const activeBranchId = branchId || currentBranch?.id
 
     const filtered = initialStaff.filter(s =>
         s.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -171,6 +174,7 @@ export function StaffClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
                     role: data.role,
                     is_active: data.is_active,
                     password: data.password,
+                    branch_id: activeBranchId,
                 })}
             />
         </div>

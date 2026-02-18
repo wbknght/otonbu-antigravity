@@ -29,9 +29,11 @@ const actionColors: Record<string, string> = {
 export function AuditClient({
     initialLogs,
     totalCount,
+    branchId,
 }: {
     initialLogs: AuditEntry[]
     totalCount: number
+    branchId?: string
 }) {
     const [logs, setLogs] = useState(initialLogs)
     const [expanded, setExpanded] = useState<string | null>(null)
@@ -42,7 +44,7 @@ export function AuditClient({
     function loadMore() {
         const nextPage = page + 1
         startTransition(async () => {
-            const result = await getAuditLog(pageSize, nextPage * pageSize)
+            const result = await getAuditLog(pageSize, nextPage * pageSize, branchId)
             setLogs(prev => [...prev, ...(result.data as AuditEntry[])])
             setPage(nextPage)
         })

@@ -4,22 +4,30 @@ import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PricingPage() {
+type Props = {
+    searchParams: Promise<{ branch?: string }>
+}
+
+export default async function PricingPage({ searchParams }: Props) {
     const userRole = await checkUserRole()
     if (userRole?.role !== 'super_admin') {
         redirect('/dashboard')
     }
 
+    const params = await searchParams
+    const branchId = params.branch
+
     const [{ data: priceLists }, { data: packages }, { data: vehicleClasses }] = await Promise.all([
-        getPriceLists(),
-        getPackages(),
-        getVehicleClasses(),
+        getPriceLists(branchId),
+        getPackages(branchId),
+        getVehicleClasses(branchId),
     ])
     return (
         <PricingClient
             initialPriceLists={priceLists}
             packages={packages}
             vehicleClasses={vehicleClasses}
+            branchId={branchId}
         />
     )
 }

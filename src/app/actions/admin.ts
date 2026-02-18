@@ -759,17 +759,19 @@ export async function getSettings(branchId?: string) {
     return { data: data || [] }
 }
 
-export async function updateSetting(key: string, value: string) {
-    const { supabase, user, branchId } = await requireAdmin()
+export async function updateSetting(key: string, value: string, branchId?: string) {
+    const { supabase, user, branchId: myBranch } = await requireAdmin(branchId)
+    const bid = branchId || myBranch
 
     const { error } = await supabase
         .from('business_settings')
         .update({ value, updated_at: new Date().toISOString(), updated_by: user.id })
         .eq('key', key)
+        .eq('branch_id', bid)
 
     if (error) return { error: error.message }
 
-    await auditLog(supabase, user.id, user.email!, 'UPDATE', 'business_settings', key, branchId, null, { key, value })
+    await auditLog(supabase, user.id, user.email!, 'UPDATE', 'business_settings', key, bid, null, { key, value })
     revalidatePath('/admin/settings')
     return { success: true }
 }
@@ -778,13 +780,14 @@ export async function updateSetting(key: string, value: string) {
 // AUDIT LOG (branch-scoped)
 // ═══════════════════════════════════════
 
-export async function getAuditLog(limit = 50, offset = 0) {
-    const { supabase, branchId, isSuperAdmin } = await requireAdmin()
+export async function getAuditLog(limit = 50, offset = 0, branchId?: string) {
+    const { supabase, branchId: myBranch, isSuperAdmin } = await requireAdmin(branchId)
+    const bid = branchId || myBranch
 
     let query = supabase
         .from('admin_audit_log')
         .select('*', { count: 'exact' })
-    if (!isSuperAdmin && branchId) query = query.eq('branch_id', branchId)
+    if (!isSuperAdmin && bid) query = query.eq('branch_id', bid)
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
 
     const { data, error, count } = await query

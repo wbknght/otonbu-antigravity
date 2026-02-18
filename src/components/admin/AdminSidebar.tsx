@@ -12,92 +12,123 @@ import {
     ClipboardList,
     ArrowLeft,
     Building2,
+    Globe,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { BranchSwitcher } from '@/components/BranchSwitcher'
 import { useBranch } from '@/contexts/BranchContext'
 
-const adminNav = [
+// Universal admin items (no branch context needed)
+const universalNav = [
     { name: tr.adminNav.services, href: '/admin/services', icon: Wrench, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin', 'partner'] },
+]
+
+// Branch-specific admin items (need branch context)
+const branchNav = [
     { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
     { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin', 'partner'] },
+    { name: 'Şubeler', href: '/admin/branches', icon: Building2, roles: ['super_admin', 'partner'] },
 ]
 
 export function AdminSidebar() {
     const pathname = usePathname()
     const { isSuperAdmin } = useBranch()
 
+    const isBranchSpecific = branchNav.some(
+        item => pathname === item.href || pathname?.startsWith(item.href + '/')
+    )
+
     return (
-        <div className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen">
+        <div className="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen">
             {/* Header */}
-            <div className="h-16 flex items-center px-6 border-b border-zinc-800">
+            <div className="h-16 flex items-center px-4 border-b border-zinc-800">
                 <h1 className="text-lg font-bold text-white">{tr.adminNav.title}</h1>
             </div>
 
-            {/* Branch Switcher */}
-            <div className="px-3 pt-3">
-                <BranchSwitcher />
-            </div>
+            {/* Branch Context - Only show on branch-specific pages */}
+            {isBranchSpecific && (
+                <div className="px-3 pt-4 pb-2 border-b border-zinc-800 bg-zinc-800/30">
+                    <div className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 px-1">
+                        Şube
+                    </div>
+                    <BranchSwitcher />
+                </div>
+            )}
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                {adminNav.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+            <nav className="flex-1 overflow-y-auto py-4">
+                {/* Universal Section */}
+                <div className="px-3 mb-6">
+                    <div className="flex items-center gap-2 px-3 mb-2 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                        <Globe className="w-3.5 h-3.5" />
+                        Evrensel
+                    </div>
+                    <div className="space-y-1">
+                        {universalNav.map((item) => {
+                            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+                            if (!isSuperAdmin && !item.roles.includes('branch_admin') && !item.roles.includes('manager')) return null
 
-                    // Filter based on role (using checkUserRole or isSuperAdmin from context)
-                    // The isSuperAdmin flag in context likely uses the new is_super_admin() DB function 
-                    // which returns true for PARTNER as well.
-                    // But here we are filtering by explicit string check. 
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                                        isActive
+                                            ? 'bg-blue-600/20 text-white border border-blue-500/30'
+                                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                                    )}
+                                >
+                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-blue-400' : 'text-zinc-500')} />
+                                    {item.name}
+                                </Link>
+                            )
+                        })}
+                    </div>
+                </div>
 
-                    // Actually, 'isSuperAdmin' from useBranch() might be strictly boolean "is user super admin OR partner".
-                    // Let's check BranchContext.
+                {/* Branch-Specific Section */}
+                <div className="px-3">
+                    <div className="flex items-center gap-2 px-3 mb-2 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                        <Building2 className="w-3.5 h-3.5" />
+                        Şube Yönetimi
+                    </div>
+                    <div className="space-y-1">
+                        {branchNav.map((item) => {
+                            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
 
-                    if (!isSuperAdmin && !item.roles.includes('branch_admin') && !item.roles.includes('manager')) return null
-                    // Wait, if isSuperAdmin is true (for partners too), this check passes.
-                    // If isSuperAdmin is false (branch_admin), we check item.roles.
+                            if (!isSuperAdmin && !item.roles.includes('branch_admin') && !item.roles.includes('manager')) return null
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all min-h-[44px]',
-                                isActive
-                                    ? 'bg-blue-600/20 text-white border border-blue-500/30'
-                                    : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                            )}
-                        >
-                            <item.icon className={cn('w-4 h-4', isActive ? 'text-blue-400' : 'text-zinc-500')} />
-                            {item.name}
-                        </Link>
-                    )
-                })}
-                {isSuperAdmin && (
-                    <Link
-                        href="/admin/branches"
-                        className={cn(
-                            'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all min-h-[44px]',
-                            pathname === '/admin/branches'
-                                ? 'bg-blue-600/20 text-white border border-blue-500/30'
-                                : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                        )}
-                    >
-                        <Building2 className={cn('w-4 h-4', pathname === '/admin/branches' ? 'text-blue-400' : 'text-zinc-500')} />
-                        Şubeler
-                    </Link>
-                )}
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                                        isActive
+                                            ? 'bg-blue-600/20 text-white border border-blue-500/30'
+                                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                                    )}
+                                >
+                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-blue-400' : 'text-zinc-500')} />
+                                    {item.name}
+                                </Link>
+                            )
+                        })}
+                    </div>
+                </div>
             </nav>
 
             {/* Back to Dashboard */}
-            <div className="border-t border-zinc-800 p-4">
+            <div className="border-t border-zinc-800 p-3">
                 <Link
                     href="/dashboard"
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white min-h-[44px]"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white"
                 >
                     <ArrowLeft className="w-4 h-4 text-zinc-500" />
                     Panele Dön

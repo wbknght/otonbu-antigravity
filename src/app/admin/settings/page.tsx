@@ -4,12 +4,18 @@ import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
-export default async function SettingsPage() {
+type Props = {
+    searchParams: Promise<{ branch?: string }>
+}
+
+export default async function SettingsPage({ searchParams }: Props) {
     const userRole = await checkUserRole()
     if (userRole?.role !== 'super_admin') {
         redirect('/dashboard')
     }
 
-    const { data: settings } = await getSettings()
-    return <SettingsClient initialSettings={settings} />
+    const params = await searchParams
+    const branchId = params.branch
+    const { data: settings } = await getSettings(branchId)
+    return <SettingsClient initialSettings={settings} branchId={branchId} />
 }

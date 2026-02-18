@@ -3,7 +3,13 @@ import { StaffClient } from './client'
 
 export const dynamic = 'force-dynamic'
 
-export default async function StaffPage() {
-    const { data: staff } = await getStaffProfiles()
-    return <StaffClient initialStaff={staff} />
+type Props = {
+    searchParams: Promise<{ branch?: string }>
+}
+
+export default async function StaffPage({ searchParams }: Props) {
+    const params = await searchParams
+    const branchId = params.branch
+    const { data: staff } = await getStaffProfiles(branchId)
+    return <StaffClient initialStaff={staff} branchId={branchId} />
 }

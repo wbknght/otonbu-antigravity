@@ -10,7 +10,7 @@ export default async function AdminLayout({
 }) {
     const session = await getSessionContext()
     if (!session) redirect('/login')
-    if (!['super_admin', 'branch_admin', 'manager'].includes(session.role)) {
+    if (!['super_admin', 'partner', 'branch_admin', 'manager'].includes(session.role)) {
         redirect('/dashboard')
     }
 

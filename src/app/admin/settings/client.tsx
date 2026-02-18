@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Settings, Save } from 'lucide-react'
 import { tr } from '@/lib/i18n/tr'
 import { updateSetting } from '@/app/actions/admin'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface Setting {
     id: string
@@ -18,16 +19,20 @@ const settingLabels: Record<string, string> = {
     timezone: tr.settings.timezone,
 }
 
-export function SettingsClient({ initialSettings }: { initialSettings: Setting[] }) {
+export function SettingsClient({ initialSettings, branchId }: { initialSettings: Setting[], branchId?: string }) {
     const [values, setValues] = useState<Record<string, string>>(
         Object.fromEntries(initialSettings.map(s => [s.key, s.value]))
     )
     const [saved, setSaved] = useState<string | null>(null)
     const [isPending, startTransition] = useTransition()
+    const { currentBranch } = useBranch()
+
+    // Use URL branchId if available, otherwise fall back to context
+    const activeBranchId = branchId || currentBranch?.id
 
     function handleSave(key: string) {
         startTransition(async () => {
-            const result = await updateSetting(key, values[key])
+            const result = await updateSetting(key, values[key], activeBranchId)
             if (!result.error) {
                 setSaved(key)
                 setTimeout(() => setSaved(null), 2000)
