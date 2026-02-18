@@ -179,23 +179,36 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                     )}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <div className="flex flex-wrap gap-1.5">
+                                    <div className="flex items-center gap-2 flex-wrap">
                                         {pkg.package_items.length === 0 ? (
-                                            <span className="text-xs text-zinc-600">—</span>
+                                            <button
+                                                onClick={() => openItems(pkg)}
+                                                className="text-xs px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors"
+                                            >
+                                                + Hizmet ekle
+                                            </button>
                                         ) : (
-                                            pkg.package_items.map(pi => (
-                                                <span
-                                                    key={pi.id}
-                                                    className={cn(
-                                                        'text-[10px] px-2 py-0.5 rounded font-medium',
-                                                        pi.is_base
-                                                            ? 'bg-blue-900/40 text-blue-300 border border-blue-800/50'
-                                                            : 'bg-zinc-700/50 text-zinc-400'
-                                                    )}
+                                            <>
+                                                {pkg.package_items.map(pi => (
+                                                    <span
+                                                        key={pi.id}
+                                                        className={cn(
+                                                            'text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1',
+                                                            pi.is_base
+                                                                ? 'bg-blue-900/40 text-blue-300 border border-blue-800/50'
+                                                                : 'bg-zinc-700/50 text-zinc-400'
+                                                        )}
+                                                    >
+                                                        {pi.services.name}
+                                                    </span>
+                                                ))}
+                                                <button
+                                                    onClick={() => openItems(pkg)}
+                                                    className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 hover:text-blue-400 hover:bg-zinc-700 transition-colors"
                                                 >
-                                                    {pi.services.name}
-                                                </span>
-                                            ))
+                                                    + Ekle
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </td>
@@ -254,7 +267,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl p-6">
                         <h3 className="text-lg font-bold text-white mb-1">{itemsEditing.name}</h3>
-                        <p className="text-sm text-zinc-500 mb-4">Paket içeriğini belirleyin. Bir hizmeti "Ana Hizmet" olarak işaretleyin.</p>
+                        <p className="text-sm text-zinc-500 mb-4">Pakete eklemek istediğiniz hizmetleri seçin. "Ana Hizmet" müşteriye gösterilen temel hizmettir.</p>
 
                         <div className="space-y-2 max-h-80 overflow-y-auto">
                             {services.filter(s => (s as any).is_active !== false).map(svc => {
