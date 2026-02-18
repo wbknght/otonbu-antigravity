@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
     Home,
     Calendar,
@@ -18,6 +18,7 @@ import { GlobalSearch } from './GlobalSearch'
 import { BranchSwitcher } from './BranchSwitcher'
 import { useBranch } from '@/contexts/BranchContext'
 import { ROLE_LABELS } from '@/types'
+import { createClient } from '@/utils/supabase/client'
 
 const navigation = [
     { name: 'Panel', href: '/dashboard', icon: Home, exact: true },
@@ -28,9 +29,17 @@ const navigation = [
 
 export function AppSidebar() {
     const pathname = usePathname()
+    const router = useRouter()
     const [isOpen, setIsOpen] = useState(false)
     const { userRole } = useBranch()
-    const canAccessAdmin = userRole && ['super_admin', 'branch_admin', 'manager'].includes(userRole)
+    const canAccessAdmin = userRole && ['super_admin', 'partner', 'branch_admin', 'manager'].includes(userRole)
+
+    async function handleLogout() {
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.push('/login')
+        router.refresh()
+    }
 
     // Close sidebar on route change (tablet nav)
     useEffect(() => {
@@ -153,7 +162,10 @@ export function AppSidebar() {
                             </span>
                         </div>
                     )}
-                    <button className="group flex w-full items-center rounded-xl px-4 py-3.5 text-base font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700 min-h-[48px]">
+                    <button
+                        onClick={handleLogout}
+                        className="group flex w-full items-center rounded-xl px-4 py-3.5 text-base font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700 min-h-[48px]"
+                    >
                         <LogOut className="mr-3 h-5 w-5 text-zinc-500 group-hover:text-white" />
                         Çıkış Yap
                     </button>
