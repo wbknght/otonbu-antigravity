@@ -374,8 +374,6 @@ export async function getPackages(branchId?: string) {
     if (error) return { error: error.message, data: [] }
     return { data: data || [] }
 }
-    return { data: data || [] }
-}
 
 export async function upsertPackage(formData: {
     id?: string
