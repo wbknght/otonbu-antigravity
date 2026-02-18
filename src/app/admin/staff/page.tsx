@@ -10,6 +10,17 @@ type Props = {
 export default async function StaffPage({ searchParams }: Props) {
     const params = await searchParams
     const branchId = params.branch
-    const { data: staff, error } = await getStaffProfiles(branchId)
-    return <StaffClient initialStaff={staff || []} branchId={branchId} />
+    const result = await getStaffProfiles(branchId)
+    
+    if (result.error) {
+        return (
+            <div className="p-8">
+                <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg">
+                    Hata: {result.error}
+                </div>
+            </div>
+        )
+    }
+    
+    return <StaffClient initialStaff={result.data || []} branchId={branchId} />
 }

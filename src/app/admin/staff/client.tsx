@@ -26,7 +26,7 @@ const roleBadgeColors: Record<string, string> = {
     partner: 'bg-indigo-900/30 text-indigo-400',
 }
 
-function getStaffFields(isEditing: boolean, callerRole: string | null) {
+function getStaffFields(isEditing: boolean, callerRole: string | null, branches: any[], currentBranchId: string | null) {
     // Role options based on caller's role
     const allRoles = [
         { value: 'staff', label: tr.staff.roles.staff },
@@ -44,19 +44,32 @@ function getStaffFields(isEditing: boolean, callerRole: string | null) {
                 ? allRoles.filter(r => ['staff', 'manager', 'branch_admin'].includes(r.value))
                 : allRoles.filter(r => ['staff', 'manager'].includes(r.value))
 
-    const fields = [
+    const fields: any[] = [
         { key: 'full_name', label: tr.staff.name, type: 'text' as const, required: true, placeholder: 'Ahmet Yılmaz' },
         { key: 'email', label: tr.staff.email, type: 'text' as const, required: true, placeholder: 'ahmet@ornek.com' },
         ...(!isEditing ? [
             { key: 'password', label: 'Şifre', type: 'password' as const, required: true, placeholder: 'Giriş şifresi' },
         ] : []),
         { key: 'phone', label: tr.staff.phone, type: 'text' as const, placeholder: '0532 xxx xx xx' },
+    ]
+
+    // Add branch selector for super admins when creating new staff
+    if (!isEditing && callerRole === 'super_admin' && branches.length > 1) {
+        const branchOptions = branches.map(b => ({ value: b.id, label: b.name }))
+        fields.push({
+            key: 'branch_id', label: 'Şube', type: 'select' as const,
+            options: branchOptions,
+            required: true,
+        })
+    }
+
+    fields.push(
         {
             key: 'role', label: tr.staff.role, type: 'select' as const,
             options: roleOptions,
         },
         { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
-    ]
+    )
 
     return fields
 }
@@ -66,7 +79,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
-    const { userRole, currentBranch } = useBranch()
+    const { userRole, currentBranch, branches, isSuperAdmin } = useBranch()
 
     // Use URL branchId if available, otherwise fall back to context
     const activeBranchId = branchId || currentBranch?.id
@@ -164,8 +177,8 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={editing ? tr.staff.edit : tr.staff.addNew}
-                fields={getStaffFields(!!editing, userRole)}
-                initialData={editing || { role: 'staff', is_active: true }}
+                fields={getStaffFields(!!editing, userRole, branches, activeBranchId || undefined)}
+                initialData={editing || { role: 'staff', is_active: true, branch_id: activeBranchId }}
                 onSubmit={async (data) => upsertStaffProfile({
                     id: editing?.id,
                     email: data.email,
