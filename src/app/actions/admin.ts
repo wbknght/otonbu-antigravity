@@ -622,12 +622,11 @@ export async function getStaffProfiles(branchId?: string) {
 
         let query = supabase.from('staff_profiles').select('*')
         
-        // Super admins see all staff or filter by selected branch
-        // Non-super admins only see their branch's staff
-        if (!isSuperAdmin) {
-            query = query.eq('branch_id', bid)
-        } else if (bid) {
-            // Super admin with branch selected - filter by that branch
+        // Exclude super_admin and partner - they're managed in /admin/users
+        query = query.not('role', 'in', '["super_admin","partner"]')
+        
+        // Filter by branch
+        if (bid) {
             query = query.eq('branch_id', bid)
         }
         
@@ -643,7 +642,7 @@ export async function getStaffProfiles(branchId?: string) {
 }
 
 export async function getAllStaff() {
-    // Only for super_admin - returns all staff across all branches
+    // Only for super_admin - returns all users (super_admin and partner) across all branches
     const { supabase, isSuperAdmin } = await requireAdmin()
     
     if (!isSuperAdmin) {
@@ -653,6 +652,7 @@ export async function getAllStaff() {
     const { data, error } = await supabase
         .from('staff_profiles')
         .select('*, branches(name)')
+        .in('role', ['super_admin', 'partner'])
         .order('full_name', { ascending: true })
 
     if (error) return { error: error.message, data: [] }
