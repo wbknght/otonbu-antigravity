@@ -25,6 +25,7 @@ const universalNav = [
     { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin', 'partner'] },
     { name: 'Kullanıcılar', href: '/admin/users', icon: Crown, roles: ['super_admin'] },
+    { name: 'Şubeler', href: '/admin/branches', icon: Building2, roles: ['super_admin', 'partner'] },
 ]
 
 // Branch-specific admin items (need branch context)
@@ -33,7 +34,6 @@ const branchNav = [
     { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
     { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin', 'partner'] },
-    { name: 'Şubeler', href: '/admin/branches', icon: Building2, roles: ['super_admin', 'partner'] },
 ]
 
 export function AdminSidebar() {

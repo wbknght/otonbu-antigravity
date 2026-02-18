@@ -6,10 +6,9 @@ import { BranchSwitcher } from '@/components/BranchSwitcher'
 // Branch-specific admin routes that need the selector in main area
 const branchRoutes = [
     '/admin/pricing',
-    '/admin/staff', 
+    '/admin/staff',
     '/admin/settings',
     '/admin/audit',
-    '/admin/branches',
 ]
 
 export function AdminBranchSelector() {
