@@ -106,7 +106,29 @@ export async function getArchivedJobs(search?: string) {
         console.error('Error fetching archived jobs:', error)
         return { data: [], count: 0 }
     }
-    return { data: data as unknown as Job[], count: count || 0 }
+
+    // Enrich with assigned staff name (for "Tamamlayan" / productivity stats)
+    const jobs = data as unknown as Job[]
+    if (jobs.length > 0) {
+        const assignedIds = [...new Set(jobs.filter(j => j.assigned_to).map(j => j.assigned_to!))]
+        if (assignedIds.length > 0) {
+            const { data: staffData } = await supabase
+                .from('staff_profiles')
+                .select('user_id, full_name, email')
+                .in('user_id', assignedIds)
+
+            if (staffData) {
+                const staffMap = new Map(staffData.map(s => [s.user_id, { full_name: s.full_name, email: s.email }]))
+                jobs.forEach(job => {
+                    if (job.assigned_to && staffMap.has(job.assigned_to)) {
+                        job.assigned_staff = staffMap.get(job.assigned_to) || null
+                    }
+                })
+            }
+        }
+    }
+
+    return { data: jobs, count: count || 0 }
 }
 
 export async function getAvailableServices(branchId?: string) {

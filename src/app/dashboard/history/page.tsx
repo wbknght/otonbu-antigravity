@@ -29,6 +29,7 @@ export default async function HistoryPage({
                                 <th className="px-6 py-4">Hizmet</th>
                                 <th className="px-6 py-4">Ücret</th>
                                 <th className="px-6 py-4">Tamamlanma</th>
+                                <th className="px-6 py-4">Tamamlayan</th>
                                 <th className="px-6 py-4">Durum</th>
                             </tr>
                         </thead>
@@ -66,6 +67,9 @@ export default async function HistoryPage({
                                                 {job.closed_at ? new Date(job.closed_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '-'}
                                             </div>
                                         </td>
+                                        <td className="px-6 py-4 text-zinc-300">
+                                            {job.assigned_staff?.full_name ?? '–'}
+                                        </td>
                                         <td className="px-6 py-4">
                                             <span className="bg-green-900/30 text-green-400 px-2 py-1 rounded-full text-xs font-medium border border-green-900/50">
                                                 {job.payment_status === 'paid' ? 'ÖDENDİ' : job.payment_status.toUpperCase()}
@@ -76,7 +80,7 @@ export default async function HistoryPage({
                             })}
                             {jobs.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-zinc-500">
+                                    <td colSpan={7} className="px-6 py-8 text-center text-zinc-500">
                                         Arşivlenmiş iş bulunamadı.
                                     </td>
                                 </tr>

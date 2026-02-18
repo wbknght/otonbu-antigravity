@@ -1,23 +1,31 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Job, VEHICLE_CLASS_LABELS } from '@/types'
-import { Clock, Archive, CreditCard, AlertTriangle } from 'lucide-react'
+import { Clock, Archive, CreditCard, AlertTriangle, UserCheck, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PaymentModal } from './PaymentModal'
 import { JobDetailsDrawer } from './JobDetailsDrawer'
-import { archiveJob } from '@/app/actions/jobs'
+import { archiveJob, claimJob } from '@/app/actions/jobs'
+import { useBranch } from '@/contexts/BranchContext'
 
 interface JobCardProps {
     job: Job
 }
 
 export function JobCard({ job }: JobCardProps) {
+    const router = useRouter()
+    const { userId, userRole } = useBranch()
     const [showPaymentModal, setShowPaymentModal] = useState(false)
     const [showDrawer, setShowDrawer] = useState(false)
     const [isArchiving, setIsArchiving] = useState(false)
+    const [isClaiming, setIsClaiming] = useState(false)
+
+    // Staff can only drag jobs assigned to them; managers+ can drag any
+    const canDrag = userRole === 'staff' ? job.assigned_to === userId : true
 
     const {
         attributes,
@@ -32,6 +40,7 @@ export function JobCard({ job }: JobCardProps) {
             type: 'Job',
             job,
         },
+        disabled: !canDrag,
     })
 
     const style = {
@@ -46,6 +55,19 @@ export function JobCard({ job }: JobCardProps) {
         setIsArchiving(true)
         await archiveJob(job.id)
         setIsArchiving(false)
+    }
+
+    async function handleClaim(e: React.MouseEvent) {
+        e.stopPropagation()
+        if (job.status !== 'queue' || job.assigned_to) return
+        setIsClaiming(true)
+        const result = await claimJob(job.id)
+        setIsClaiming(false)
+        if (result?.error) {
+            alert(result.error)
+            return
+        }
+        router.refresh()
     }
 
     if (isDragging) {
@@ -70,8 +92,8 @@ export function JobCard({ job }: JobCardProps) {
                 {...listeners}
                 className={cn(
                     "bg-zinc-800 p-4 rounded-xl border border-zinc-700 hover:border-zinc-600",
-                    "cursor-grab active:cursor-grabbing shadow-sm",
-                    "flex flex-col gap-2 group relative",
+                    canDrag && "cursor-grab active:cursor-grabbing",
+                    "shadow-sm flex flex-col gap-2 group relative",
                     "touch-none"
                 )}
                 onDoubleClick={() => setShowDrawer(true)}
@@ -88,9 +110,28 @@ export function JobCard({ job }: JobCardProps) {
                             </span>
                         )}
                     </div>
-                    <div className="flex items-center text-xs text-zinc-400 bg-zinc-900/50 px-2 py-1 rounded">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {timeElapsed}
+                    <div className="flex items-center gap-2">
+                        {job.assigned_staff && (
+                            <span
+                                className={cn(
+                                    "text-xs px-2 py-1 rounded font-medium flex items-center gap-1",
+                                    job.assigned_to === userId
+                                        ? "bg-emerald-900/40 text-emerald-400"
+                                        : "bg-zinc-700 text-zinc-300"
+                                )}
+                                title={job.assigned_to === userId ? 'Sizin işiniz' : job.assigned_staff.full_name}
+                            >
+                                {job.assigned_to === userId ? (
+                                    <><User className="w-3 h-3" /> Sizin</>
+                                ) : (
+                                    <><User className="w-3 h-3" /> {job.assigned_staff.full_name}</>
+                                )}
+                            </span>
+                        )}
+                        <div className="flex items-center text-xs text-zinc-400 bg-zinc-900/50 px-2 py-1 rounded">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {timeElapsed}
+                        </div>
                     </div>
                 </div>
 
@@ -124,9 +165,30 @@ export function JobCard({ job }: JobCardProps) {
                         {job.payment_status === 'paid' ? 'ÖDENDİ' : 'BEKLİYOR'}
                     </span>
 
-                    {hasActions && (
-                        <div className="flex gap-2">
-                            {job.payment_status === 'pending' && (
+                    <div className="flex gap-2">
+                        {job.status === 'queue' && !job.assigned_to && userId && (
+                            <button
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={handleClaim}
+                                disabled={isClaiming}
+                                className={cn(
+                                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium",
+                                    "min-h-[44px] min-w-[44px]",
+                                    "bg-emerald-600/20 text-emerald-400",
+                                    "hover:bg-emerald-600 hover:text-white",
+                                    "active:bg-emerald-700 active:scale-95",
+                                    "transition-all",
+                                    isClaiming && "opacity-50 cursor-not-allowed"
+                                )}
+                                title="İşi bana al"
+                            >
+                                <UserCheck className="w-4 h-4" />
+                                <span className="hidden sm:inline">{isClaiming ? '...' : 'İşi Al'}</span>
+                            </button>
+                        )}
+                        {hasActions && (
+                            <>
+                                {job.payment_status === 'pending' && (
                                 <button
                                     onPointerDown={(e) => e.stopPropagation()}
                                     onClick={(e) => {
@@ -170,8 +232,9 @@ export function JobCard({ job }: JobCardProps) {
                                     </span>
                                 </button>
                             )}
-                        </div>
-                    )}
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
