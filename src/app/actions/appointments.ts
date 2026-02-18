@@ -3,13 +3,36 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getAppointments() {
+// ─── Session helper ───
+
+async function getStaffSession() {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Oturum açmanız gerekiyor')
+
+    const { data: staff } = await supabase
+        .from('staff_profiles')
+        .select('role, branch_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+    if (!staff) throw new Error('Personel profili bulunamadı')
+
+    return {
+        supabase,
+        branchId: staff.branch_id,
+        isSuperAdmin: staff.role === 'super_admin' || staff.role === 'partner',
+    }
+}
+
+export async function getAppointments(branchId?: string) {
+    const { supabase, branchId: myBranch, isSuperAdmin } = await getStaffSession()
+    const bid = branchId || myBranch
 
     const { data, error } = await supabase
         .from('appointments')
         .select(`
-            *,
             *,
             services (
                 name,
@@ -23,11 +46,16 @@ export async function getAppointments() {
         return []
     }
 
+    // Filter by branch_id for non-superadmins (RLS should handle this, but double-check)
+    if (!isSuperAdmin && bid) {
+        return data?.filter((a: any) => a.branch_id === bid) || []
+    }
+
     return data
 }
 
 export async function createAppointment(formData: FormData) {
-    const supabase = await createClient()
+    const { supabase, branchId } = await getStaffSession()
 
     const customerName = formData.get('customerName') as string
     const customerPhone = formData.get('customerPhone') as string
@@ -41,6 +69,9 @@ export async function createAppointment(formData: FormData) {
     if (!customerName || !scheduledTime || !serviceId) {
         return { error: 'Zorunlu alanlar eksik' }
     }
+    if (!branchId) {
+        return { error: 'Şube bilgisi bulunamadı' }
+    }
 
     const { error } = await supabase
         .from('appointments')
@@ -51,6 +82,7 @@ export async function createAppointment(formData: FormData) {
                 plate_number: plateNumber?.toUpperCase(),
                 scheduled_time: scheduledTime,
                 service_id: serviceId,
+                branch_id: branchId,
                 is_valet: isValet,
                 valet_address: isValet ? valetAddress : null
             }
@@ -66,7 +98,7 @@ export async function createAppointment(formData: FormData) {
 }
 
 export async function convertAppointmentToJob(appointmentId: string) {
-    const supabase = await createClient()
+    const { supabase, branchId } = await getStaffSession()
 
     // 1. Get Appointment
     const { data: appointment, error: fetchError } = await supabase
@@ -79,6 +111,10 @@ export async function convertAppointmentToJob(appointmentId: string) {
         return { error: 'Randevu bulunamadı' }
     }
 
+    if (!branchId) {
+        return { error: 'Şube bilgisi bulunamadı' }
+    }
+
     // 2. Create Job
     const { data: job, error: jobError } = await supabase
         .from('jobs')
@@ -87,7 +123,8 @@ export async function convertAppointmentToJob(appointmentId: string) {
                 plate_number: appointment.plate_number || 'UNKNOWN',
                 service_id: appointment.service_id,
                 status: 'queue',
-                payment_status: 'pending'
+                payment_status: 'pending',
+                branch_id: branchId
             }
         ])
         .select()

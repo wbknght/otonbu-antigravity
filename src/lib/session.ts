@@ -32,7 +32,7 @@ export async function getSessionContext(): Promise<SessionContext | null> {
     if (!staff) return null
 
     const role = staff.role as StaffRole
-    const isSuperAdmin = role === 'super_admin'
+    const isSuperAdmin = role === 'super_admin' || role === 'partner'
 
     // Get all branches for super_admin, otherwise just own branch
     let allBranches: Branch[] = []

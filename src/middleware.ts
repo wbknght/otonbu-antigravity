@@ -53,9 +53,9 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/login', request.url))
         }
 
-        // /admin routes: super_admin, branch_admin, or manager only
+        // /admin routes: super_admin, partner, branch_admin, or manager only
         if (pathname.startsWith('/admin')) {
-            const adminRoles = ['super_admin', 'branch_admin', 'manager']
+            const adminRoles = ['super_admin', 'partner', 'branch_admin', 'manager']
             if (!adminRoles.includes(staff.role)) {
                 return NextResponse.redirect(new URL('/dashboard', request.url))
             }

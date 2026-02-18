@@ -27,7 +27,7 @@ async function getStaffSession() {
         role: staff.role as StaffRole,
         branchId: staff.branch_id as string,
         fullName: staff.full_name,
-        isSuperAdmin: staff.role === 'super_admin',
+        isSuperAdmin: staff.role === 'super_admin' || staff.role === 'partner',
     }
 }
 
