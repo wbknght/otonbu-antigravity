@@ -21,7 +21,6 @@ export const tr = {
         packages: 'Paketler',
         pricing: 'Fiyatlandırma',
         staff: 'Personel',
-        locations: 'Lokasyonlar',
         settings: 'Ayarlar',
         audit: 'İşlem Geçmişi',
     },
@@ -105,20 +104,6 @@ export const tr = {
         inactive: 'Pasif',
         confirmDisable: 'Bu personeli pasife almak istediğinize emin misiniz?',
         saved: 'Personel kaydedildi',
-    },
-
-    // ── Locations ──
-    locations: {
-        title: 'Lokasyonlar',
-        addNew: 'Yeni Lokasyon',
-        edit: 'Lokasyonu Düzenle',
-        name: 'Lokasyon Adı',
-        address: 'Adres',
-        phone: 'Telefon',
-        workingHours: 'Çalışma Saatleri',
-        valetWindows: 'Vale Saatleri',
-        blackoutDates: 'Tatil Günleri',
-        saved: 'Lokasyon kaydedildi',
     },
 
     // ── Settings ──

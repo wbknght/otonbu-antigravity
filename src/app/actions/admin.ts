@@ -743,63 +743,6 @@ export async function toggleStaffActive(id: string, is_active: boolean) {
 }
 
 // ═══════════════════════════════════════
-// LOCATIONS (branch-scoped)
-// ═══════════════════════════════════════
-
-export async function getLocations(branchId?: string) {
-    const { supabase, branchId: myBranch } = await requireAdmin(branchId)
-    const bid = branchId || myBranch
-
-    let query = supabase.from('locations').select('*')
-    if (bid) query = query.eq('branch_id', bid)
-    query = query.order('name', { ascending: true })
-
-    const { data, error } = await query
-    if (error) return { error: error.message, data: [] }
-    return { data: data || [] }
-}
-
-export async function upsertLocation(formData: {
-    id?: string
-    name: string
-    address?: string
-    phone?: string
-    is_active?: boolean
-    branch_id?: string
-}) {
-    const { supabase, user, branchId } = await requireAdmin(formData.branch_id)
-    const isNew = !formData.id
-    const bid = formData.branch_id || branchId
-
-    if (!formData.name?.trim()) return { error: 'Lokasyon adı zorunludur' }
-    if (!bid) return { error: 'Şube bilgisi gerekli' }
-
-    const payload = {
-        name: formData.name.trim(),
-        address: formData.address?.trim() || null,
-        phone: formData.phone?.trim() || null,
-        is_active: formData.is_active ?? true,
-        branch_id: bid,
-        updated_at: new Date().toISOString(),
-        updated_by: user.id,
-        ...(isNew ? { created_by: user.id } : {}),
-    }
-
-    let result
-    if (isNew) {
-        result = await supabase.from('locations').insert([payload]).select().single()
-    } else {
-        result = await supabase.from('locations').update(payload).eq('id', formData.id).select().single()
-    }
-
-    if (result.error) return { error: result.error.message }
-
-    await auditLog(supabase, user.id, user.email!, isNew ? 'CREATE' : 'UPDATE', 'locations', result.data.id, bid, null, payload)
-    revalidatePath('/admin/locations')
-    return { success: true }
-}
-
-// ═══════════════════════════════════════
 // SETTINGS (branch-scoped)
 // ═══════════════════════════════════════
 

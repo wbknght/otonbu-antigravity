@@ -8,7 +8,6 @@ import {
     Package,
     DollarSign,
     Users,
-    MapPin,
     Settings,
     ClipboardList,
     ArrowLeft,
@@ -25,7 +24,6 @@ const adminNav = [
     { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
-    { name: tr.adminNav.locations, href: '/admin/locations', icon: MapPin, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin', 'partner'] },
 ]
