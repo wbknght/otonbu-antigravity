@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle, Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
@@ -64,6 +65,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
     const [editing, setEditing] = useState<StaffProfile | null>(null)
     const [confirmDelete, setConfirmDelete] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
     const { userRole, currentBranch, branches, isSuperAdmin } = useBranch()
 
     // Use URL branchId if available, otherwise fall back to context
@@ -83,8 +85,9 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
     function handleDelete() {
         if (!confirmDelete) return
         startTransition(async () => {
-            await deleteStaffProfile(confirmDelete.id)
+            const result = await deleteStaffProfile(confirmDelete.id)
             setConfirmDelete(null)
+            if (!result?.error) router.refresh()
         })
     }
 

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle, Crown, Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
@@ -49,6 +50,7 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
     const [editing, setEditing] = useState<StaffProfile | null>(null)
     const [confirmDelete, setConfirmDelete] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
     const { isSuperAdmin } = useBranch()
 
     const filtered = initialStaff.filter(s =>
@@ -65,8 +67,9 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
     function handleDelete() {
         if (!confirmDelete) return
         startTransition(async () => {
-            await deleteStaffProfile(confirmDelete.id)
+            const result = await deleteStaffProfile(confirmDelete.id)
             setConfirmDelete(null)
+            if (!result?.error) router.refresh()
         })
     }
 
@@ -162,6 +165,17 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
                     is_active: data.is_active,
                     password: data.password,
                 })}
+            />
+
+            {/* Delete Confirm */}
+            <ConfirmDialog
+                isOpen={!!confirmDelete}
+                onClose={() => setConfirmDelete(null)}
+                onConfirm={handleDelete}
+                title="Kullanıcı Sil"
+                message="Bu kullanıcıyı silmek istediğinize emin misiniz?"
+                confirmLabel="Sil"
+                loading={isPending}
             />
         </div>
     )
