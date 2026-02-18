@@ -778,6 +778,22 @@ export async function toggleStaffActive(id: string, is_active: boolean) {
     return { success: true }
 }
 
+export async function deleteStaffProfile(id: string) {
+    const { supabase, user, branchId, isSuperAdmin } = await requireAdmin()
+
+    if (!isSuperAdmin) {
+        return { error: 'Sadece süper admin kullanıcı silebilir' }
+    }
+
+    const { error } = await supabase.from('staff_profiles').delete().eq('id', id)
+    if (error) return { error: error.message }
+
+    await auditLog(supabase, user.id, user.email!, 'DELETE', 'staff_profiles', id, branchId)
+    revalidatePath('/admin/staff')
+    revalidatePath('/admin/users')
+    return { success: true }
+}
+
 // ═══════════════════════════════════════
 // SETTINGS (branch-scoped)
 // ═══════════════════════════════════════

@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle } from 'lucide-react'
+import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
-import { upsertStaffProfile, toggleStaffActive } from '@/app/actions/admin'
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog'
+import { upsertStaffProfile, toggleStaffActive, deleteStaffProfile } from '@/app/actions/admin'
 import { useBranch } from '@/contexts/BranchContext'
 
 interface StaffProfile {
@@ -61,6 +62,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
     const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<StaffProfile | null>(null)
+    const [confirmDelete, setConfirmDelete] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
     const { userRole, currentBranch, branches, isSuperAdmin } = useBranch()
 
@@ -75,6 +77,14 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
     function handleToggle(staff: StaffProfile) {
         startTransition(async () => {
             await toggleStaffActive(staff.id, !staff.is_active)
+        })
+    }
+
+    function handleDelete() {
+        if (!confirmDelete) return
+        startTransition(async () => {
+            await deleteStaffProfile(confirmDelete.id)
+            setConfirmDelete(null)
         })
     }
 
@@ -147,6 +157,12 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                             >
                                 {staff.is_active ? <ToggleRight className="w-4 h-4 text-green-400" /> : <ToggleLeft className="w-4 h-4" />}
                             </button>
+                            <button
+                                onClick={() => setConfirmDelete(staff)}
+                                className="p-2 text-zinc-400 hover:text-red-400 hover:bg-zinc-700 rounded-lg transition-all"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -172,6 +188,17 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                     password: data.password,
                     branch_id: activeBranchId,
                 })}
+            />
+
+            {/* Delete Confirm */}
+            <ConfirmDialog
+                isOpen={!!confirmDelete}
+                onClose={() => setConfirmDelete(null)}
+                onConfirm={handleDelete}
+                title={tr.common.delete}
+                message="Bu personeli silmek istediğinize emin misiniz?"
+                confirmLabel={tr.common.delete}
+                loading={isPending}
             />
         </div>
     )

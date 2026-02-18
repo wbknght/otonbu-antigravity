@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle, Crown } from 'lucide-react'
+import { Plus, Pencil, Search, ToggleLeft, ToggleRight, UserCircle, Crown, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
 import { FormModal } from '@/components/admin/FormModal'
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog'
-import { upsertStaffProfile, toggleStaffActive, getAllStaff } from '@/app/actions/admin'
+import { upsertStaffProfile, toggleStaffActive, deleteStaffProfile } from '@/app/actions/admin'
 import { useBranch } from '@/contexts/BranchContext'
 
 interface StaffProfile {
@@ -47,6 +47,7 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
     const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [editing, setEditing] = useState<StaffProfile | null>(null)
+    const [confirmDelete, setConfirmDelete] = useState<StaffProfile | null>(null)
     const [isPending, startTransition] = useTransition()
     const { isSuperAdmin } = useBranch()
 
@@ -58,6 +59,14 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
     function handleToggle(staff: StaffProfile) {
         startTransition(async () => {
             await toggleStaffActive(staff.id, !staff.is_active)
+        })
+    }
+
+    function handleDelete() {
+        if (!confirmDelete) return
+        startTransition(async () => {
+            await deleteStaffProfile(confirmDelete.id)
+            setConfirmDelete(null)
         })
     }
 
@@ -122,6 +131,12 @@ export function UsersClient({ initialStaff }: { initialStaff: StaffProfile[] }) 
                                 className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-all"
                             >
                                 {staff.is_active ? <ToggleRight className="w-4 h-4 text-green-400" /> : <ToggleLeft className="w-4 h-4" />}
+                            </button>
+                            <button
+                                onClick={() => setConfirmDelete(staff)}
+                                className="p-2 text-zinc-400 hover:text-red-400 hover:bg-zinc-700 rounded-lg transition-all"
+                            >
+                                <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
