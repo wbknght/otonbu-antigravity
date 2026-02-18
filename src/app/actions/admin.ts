@@ -282,7 +282,7 @@ export async function deleteService(id: string) {
 
 export async function getVehicleClasses(branchId?: string) {
     // For pricing purposes, show all vehicle classes regardless of branch
-    const { supabase } = await createClient()
+    const supabase = await createClient()
 
     let query = supabase.from('vehicle_classes').select('*')
     query = query.order('sort_order', { ascending: true })
@@ -359,7 +359,7 @@ export async function toggleVehicleClassActive(id: string, is_active: boolean) {
 export async function getPackages(branchId?: string) {
     // For pricing purposes, show all packages regardless of branch
     // since pricing is branch-specific but packages/vehicle_classes should be available
-    const { supabase } = await createClient()
+    const supabase = await createClient()
 
     let query = supabase.from('packages').select(`
         *,
