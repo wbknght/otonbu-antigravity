@@ -337,12 +337,15 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                 fields={packageFields}
                 initialData={editing || { is_active: true, sort_order: 0 }}
                 onSubmit={async (data) => {
+                    const branchId = currentBranch?.id
+                    if (!branchId) return { error: 'Önce bir şube seçmeniz gerekiyor' }
                     return upsertPackage({
                         id: editing?.id,
                         name: data.name,
                         description: data.description,
                         is_active: data.is_active,
                         sort_order: data.sort_order,
+                        branch_id: branchId,
                     })
                 }}
             />
