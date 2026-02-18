@@ -47,8 +47,8 @@ interface VehicleClass {
 
 const priceListFields = [
     { key: 'name', label: 'Liste Adı', type: 'text' as const, required: true, placeholder: '2026 Standart Fiyatlar' },
-    { key: 'valid_from', label: tr.pricing.validFrom, type: 'text' as const, placeholder: '2026-01-01' },
-    { key: 'valid_to', label: tr.pricing.validTo, type: 'text' as const, placeholder: '2026-12-31' },
+    { key: 'valid_from', label: tr.pricing.validFrom, type: 'date' as const },
+    { key: 'valid_to', label: tr.pricing.validTo, type: 'date' as const },
     { key: 'is_active', label: tr.common.active, type: 'checkbox' as const },
 ]
 

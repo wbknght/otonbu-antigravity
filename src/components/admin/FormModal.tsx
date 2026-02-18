@@ -8,7 +8,7 @@ import { tr } from '@/lib/i18n/tr'
 interface FormField {
     key: string
     label: string
-    type: 'text' | 'number' | 'textarea' | 'checkbox' | 'select' | 'password'
+    type: 'text' | 'number' | 'textarea' | 'checkbox' | 'select' | 'password' | 'date'
     required?: boolean
     placeholder?: string
     options?: { value: string; label: string }[]
@@ -112,7 +112,7 @@ export function FormModal({ isOpen, onClose, title, fields, initialData, onSubmi
                                         </select>
                                     ) : (
                                         <input
-                                            type={field.type}
+                                            type={field.type === 'date' ? 'date' : field.type}
                                             value={data[field.key] ?? ''}
                                             onChange={e => handleChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
                                             placeholder={field.placeholder}
