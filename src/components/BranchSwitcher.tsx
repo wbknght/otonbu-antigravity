@@ -31,11 +31,13 @@ export function BranchSwitcher({ basePath = '/admin' }: BranchSwitcherProps) {
     }, [])
 
     const handleBranchSelect = (branchId: string) => {
-        // Update URL with branch param
+        // Build the new URL with branch param
         const params = new URLSearchParams(searchParams.toString())
         params.set('branch', branchId)
-        router.push(`${basePath}?${params.toString()}`)
-        setIsOpen(false)
+        const newUrl = `${basePath}?${params.toString()}`
+        
+        // Use full page navigation to ensure server component re-renders
+        window.location.href = newUrl
     }
 
     // Only render for super_admin with multiple branches

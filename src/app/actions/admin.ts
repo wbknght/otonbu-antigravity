@@ -617,17 +617,30 @@ export async function checkUserRole() {
 }
 
 export async function getStaffProfiles(branchId?: string) {
-    const { supabase, branchId: myBranch, isSuperAdmin } = await requireAdmin(branchId)
-    const bid = branchId || myBranch
+    try {
+        const { supabase, branchId: myBranch, isSuperAdmin, role } = await requireAdmin(branchId)
+        const bid = branchId || myBranch
 
-    let query = supabase.from('staff_profiles').select('*')
-    if (bid && !isSuperAdmin) query = query.eq('branch_id', bid)
-    else if (bid) query = query.eq('branch_id', bid)
-    query = query.order('full_name', { ascending: true })
+        let query = supabase.from('staff_profiles').select('*')
+        
+        // Super admins see all staff or filter by selected branch
+        // Non-super admins only see their branch's staff
+        if (!isSuperAdmin) {
+            query = query.eq('branch_id', bid)
+        } else if (bid) {
+            // Super admin with branch selected - filter by that branch
+            query = query.eq('branch_id', bid)
+        }
+        
+        query = query.order('full_name', { ascending: true })
 
-    const { data, error } = await query
-    if (error) return { error: error.message, data: [] }
-    return { data: data || [] }
+        const { data, error } = await query
+        if (error) return { error: error.message, data: [] }
+        return { data: data || [] }
+    } catch (err: any) {
+        console.error('getStaffProfiles error:', err.message)
+        return { error: err.message, data: [] }
+    }
 }
 
 export async function upsertStaffProfile(formData: {

@@ -10,6 +10,6 @@ type Props = {
 export default async function StaffPage({ searchParams }: Props) {
     const params = await searchParams
     const branchId = params.branch
-    const { data: staff } = await getStaffProfiles(branchId)
-    return <StaffClient initialStaff={staff} branchId={branchId} />
+    const { data: staff, error } = await getStaffProfiles(branchId)
+    return <StaffClient initialStaff={staff || []} branchId={branchId} />
 }
