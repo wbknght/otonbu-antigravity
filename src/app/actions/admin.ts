@@ -281,11 +281,10 @@ export async function deleteService(id: string) {
 // ═══════════════════════════════════════
 
 export async function getVehicleClasses(branchId?: string) {
-    const { supabase, branchId: myBranch } = await requireAdmin(branchId)
-    const bid = branchId || myBranch
+    // For pricing purposes, show all vehicle classes regardless of branch
+    const { supabase } = await createClient()
 
     let query = supabase.from('vehicle_classes').select('*')
-    if (bid) query = query.eq('branch_id', bid)
     query = query.order('sort_order', { ascending: true })
 
     const { data, error } = await query
@@ -358,8 +357,9 @@ export async function toggleVehicleClassActive(id: string, is_active: boolean) {
 // ═══════════════════════════════════════
 
 export async function getPackages(branchId?: string) {
-    const { supabase, branchId: myBranch } = await requireAdmin(branchId)
-    const bid = branchId || myBranch
+    // For pricing purposes, show all packages regardless of branch
+    // since pricing is branch-specific but packages/vehicle_classes should be available
+    const { supabase } = await createClient()
 
     let query = supabase.from('packages').select(`
         *,
@@ -368,11 +368,12 @@ export async function getPackages(branchId?: string) {
             services ( id, name )
         )
     `)
-    if (bid) query = query.eq('branch_id', bid)
     query = query.order('sort_order', { ascending: true }).order('name', { ascending: true })
 
     const { data, error } = await query
     if (error) return { error: error.message, data: [] }
+    return { data: data || [] }
+}
     return { data: data || [] }
 }
 
