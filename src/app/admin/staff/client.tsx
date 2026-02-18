@@ -177,7 +177,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={editing ? tr.staff.edit : tr.staff.addNew}
-                fields={getStaffFields(!!editing, userRole, branches, activeBranchId || undefined)}
+                fields={getStaffFields(!!editing, userRole, branches, activeBranchId || null)}
                 initialData={editing || { role: 'staff', is_active: true, branch_id: activeBranchId }}
                 onSubmit={async (data) => upsertStaffProfile({
                     id: editing?.id,
