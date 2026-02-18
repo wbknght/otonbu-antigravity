@@ -13,6 +13,7 @@ import {
     ArrowLeft,
     Building2,
     Globe,
+    Crown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
@@ -23,6 +24,7 @@ const universalNav = [
     { name: tr.adminNav.services, href: '/admin/services', icon: Wrench, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin', 'partner'] },
+    { name: 'Kullanıcılar', href: '/admin/users', icon: Crown, roles: ['super_admin'] },
 ]
 
 // Branch-specific admin items (need branch context)

@@ -642,6 +642,23 @@ export async function getStaffProfiles(branchId?: string) {
     }
 }
 
+export async function getAllStaff() {
+    // Only for super_admin - returns all staff across all branches
+    const { supabase, isSuperAdmin } = await requireAdmin()
+    
+    if (!isSuperAdmin) {
+        return { error: 'Yetkiniz yok', data: [] }
+    }
+
+    const { data, error } = await supabase
+        .from('staff_profiles')
+        .select('*, branches(name)')
+        .order('full_name', { ascending: true })
+
+    if (error) return { error: error.message, data: [] }
+    return { data: data || [] }
+}
+
 export async function upsertStaffProfile(formData: {
     id?: string
     email: string
@@ -736,6 +753,7 @@ export async function upsertStaffProfile(formData: {
 
     await auditLog(supabase, user.id, user.email!, isNew ? 'CREATE' : 'UPDATE', 'staff_profiles', result.data.id, bid, null, payload)
     revalidatePath('/admin/staff')
+    revalidatePath('/admin/users')
     return { success: true }
 }
 
