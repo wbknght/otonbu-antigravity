@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminBranchSelector } from '@/components/admin/AdminBranchSelector'
 import { BranchProvider } from '@/contexts/BranchContext'
 import { getSessionContext } from '@/lib/session'
 
@@ -25,6 +26,7 @@ export default async function AdminLayout({
             <div className="flex h-screen bg-zinc-950">
                 <AdminSidebar />
                 <main className="flex-1 overflow-y-auto p-8 text-zinc-100">
+                    <AdminBranchSelector />
                     {children}
                 </main>
             </div>

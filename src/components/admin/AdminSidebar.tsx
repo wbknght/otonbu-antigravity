@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -16,7 +14,6 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
-import { BranchSwitcher } from '@/components/BranchSwitcher'
 import { useBranch } from '@/contexts/BranchContext'
 
 // Universal admin items (no branch context needed)
@@ -39,26 +36,12 @@ export function AdminSidebar() {
     const pathname = usePathname()
     const { isSuperAdmin } = useBranch()
 
-    const isBranchSpecific = branchNav.some(
-        item => pathname === item.href || pathname?.startsWith(item.href + '/')
-    )
-
     return (
         <div className="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen">
             {/* Header */}
             <div className="h-16 flex items-center px-4 border-b border-zinc-800">
                 <h1 className="text-lg font-bold text-white">{tr.adminNav.title}</h1>
             </div>
-
-            {/* Branch Context - Only show on branch-specific pages */}
-            {isBranchSpecific && (
-                <div className="px-3 pt-4 pb-2 border-b border-zinc-800 bg-zinc-800/30">
-                    <div className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 px-1">
-                        Şube
-                    </div>
-                    <BranchSwitcher />
-                </div>
-            )}
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-4">
