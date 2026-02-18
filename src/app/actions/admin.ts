@@ -10,16 +10,22 @@ import { StaffRole } from '@/types'
 async function requireAdmin(overrideBranchId?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Oturum açmanız gerekiyor')
+    if (!user) {
+        throw new Error('Oturum açmanız gerekiyor')
+    }
 
     const { data: staff } = await supabase
         .from('staff_profiles')
         .select('role, branch_id')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single()
+        .maybeSingle() // Use maybeSingle instead of single to handle no results gracefully
 
-    if (!staff || !['super_admin', 'partner', 'branch_admin', 'manager'].includes(staff.role)) {
+    if (!staff) {
+        throw new Error('Personel profili bulunamadı')
+    }
+
+    if (!['super_admin', 'partner', 'branch_admin', 'manager'].includes(staff.role)) {
         throw new Error('Bu işlem için yetkiniz yok')
     }
 
@@ -623,7 +629,7 @@ export async function getStaffProfiles(branchId?: string) {
         let query = supabase.from('staff_profiles').select('*')
         
         // Exclude super_admin and partner - they're managed in /admin/users
-        query = query.not('role', 'in', '["super_admin","partner"]')
+        query = query.or('role.eq.staff,role.eq.manager,role.eq.branch_admin')
         
         // Filter by branch
         if (bid) {
@@ -652,7 +658,7 @@ export async function getAllStaff() {
     const { data, error } = await supabase
         .from('staff_profiles')
         .select('*, branches(name)')
-        .in('role', ['super_admin', 'partner'])
+        .or('role.eq.super_admin,role.eq.partner')
         .order('full_name', { ascending: true })
 
     if (error) return { error: error.message, data: [] }
