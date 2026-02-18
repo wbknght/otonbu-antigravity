@@ -23,6 +23,7 @@ const roleBadgeColors: Record<string, string> = {
     branch_admin: 'bg-red-900/30 text-red-400',
     manager: 'bg-yellow-900/30 text-yellow-400',
     staff: 'bg-blue-900/30 text-blue-400',
+    partner: 'bg-indigo-900/30 text-indigo-400',
 }
 
 function getStaffFields(isEditing: boolean, callerRole: string | null) {
@@ -31,14 +32,17 @@ function getStaffFields(isEditing: boolean, callerRole: string | null) {
         { value: 'staff', label: tr.staff.roles.staff },
         { value: 'manager', label: tr.staff.roles.manager },
         { value: 'branch_admin', label: tr.staff.roles.branch_admin },
+        { value: 'partner', label: tr.staff.roles.partner },
         { value: 'super_admin', label: tr.staff.roles.super_admin },
     ]
 
     const roleOptions = callerRole === 'super_admin'
         ? allRoles
-        : callerRole === 'branch_admin'
+        : callerRole === 'partner'
             ? allRoles.filter(r => ['staff', 'manager', 'branch_admin'].includes(r.value))
-            : allRoles.filter(r => ['staff', 'manager'].includes(r.value))
+            : callerRole === 'branch_admin'
+                ? allRoles.filter(r => ['staff', 'manager', 'branch_admin'].includes(r.value))
+                : allRoles.filter(r => ['staff', 'manager'].includes(r.value))
 
     const fields = [
         { key: 'full_name', label: tr.staff.name, type: 'text' as const, required: true, placeholder: 'Ahmet Yılmaz' },

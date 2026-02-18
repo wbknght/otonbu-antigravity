@@ -20,14 +20,14 @@ import { BranchSwitcher } from '@/components/BranchSwitcher'
 import { useBranch } from '@/contexts/BranchContext'
 
 const adminNav = [
-    { name: tr.adminNav.services, href: '/admin/services', icon: Wrench, roles: ['super_admin'] },
-    { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin'] },
-    { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin'] },
-    { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin'] },
-    { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'branch_admin', 'manager'] },
-    { name: tr.adminNav.locations, href: '/admin/locations', icon: MapPin, roles: ['super_admin'] },
-    { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin'] },
-    { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin'] },
+    { name: tr.adminNav.services, href: '/admin/services', icon: Wrench, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.vehicles, href: '/admin/vehicles', icon: Car, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.packages, href: '/admin/packages', icon: Package, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
+    { name: tr.adminNav.locations, href: '/admin/locations', icon: MapPin, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin', 'partner'] },
+    { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin', 'partner'] },
 ]
 
 export function AdminSidebar() {
@@ -51,8 +51,17 @@ export function AdminSidebar() {
                 {adminNav.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
 
-                    // Filter based on role
-                    if (!isSuperAdmin && !item.roles.includes('branch_admin')) return null
+                    // Filter based on role (using checkUserRole or isSuperAdmin from context)
+                    // The isSuperAdmin flag in context likely uses the new is_super_admin() DB function 
+                    // which returns true for PARTNER as well.
+                    // But here we are filtering by explicit string check. 
+
+                    // Actually, 'isSuperAdmin' from useBranch() might be strictly boolean "is user super admin OR partner".
+                    // Let's check BranchContext.
+
+                    if (!isSuperAdmin && !item.roles.includes('branch_admin') && !item.roles.includes('manager')) return null
+                    // Wait, if isSuperAdmin is true (for partners too), this check passes.
+                    // If isSuperAdmin is false (branch_admin), we check item.roles.
 
                     return (
                         <Link

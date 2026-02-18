@@ -19,11 +19,11 @@ async function requireAdmin(overrideBranchId?: string) {
         .eq('is_active', true)
         .single()
 
-    if (!staff || !['super_admin', 'branch_admin', 'manager'].includes(staff.role)) {
+    if (!staff || !['super_admin', 'partner', 'branch_admin', 'manager'].includes(staff.role)) {
         throw new Error('Bu işlem için yetkiniz yok')
     }
 
-    const isSuperAdmin = staff.role === 'super_admin'
+    const isSuperAdmin = ['super_admin', 'partner'].includes(staff.role)
     const branchId = isSuperAdmin
         ? (overrideBranchId || staff.branch_id)
         : staff.branch_id
@@ -647,11 +647,16 @@ export async function upsertStaffProfile(formData: {
     }
 
     // Role permission checks
-    if (formData.role === 'super_admin' && !isSuperAdmin) {
+    if (formData.role === 'super_admin' && callerRole !== 'super_admin') {
         return { error: 'Sadece süper admin bu rolü atayabilir' }
     }
+    // Partners cannot create partners or super admins (enforced by the check above for super_admin, adding partner specific check if needed)
+    if (formData.role === 'partner' && callerRole !== 'super_admin') {
+        return { error: 'Sadece süper admin iş ortağı atayabilir' }
+    }
+
     if (formData.role === 'branch_admin' && !isSuperAdmin) {
-        return { error: 'Sadece süper admin şube yöneticisi atayabilir' }
+        return { error: 'Sadece süper admin veya iş ortağı şube yöneticisi atayabilir' }
     }
     if (callerRole === 'manager' && !['staff', 'manager'].includes(formData.role)) {
         return { error: 'Yöneticiler sadece personel ve yönetici ekleyebilir' }
@@ -690,7 +695,7 @@ export async function upsertStaffProfile(formData: {
         full_name: formData.full_name.trim(),
         phone: formData.phone?.trim() || null,
         role: formData.role || 'staff',
-        branch_id: formData.role === 'super_admin' ? null : bid,
+        branch_id: ['super_admin', 'partner'].includes(formData.role) ? null : bid,
         is_active: formData.is_active ?? true,
         updated_at: new Date().toISOString(),
         updated_by: user.id,

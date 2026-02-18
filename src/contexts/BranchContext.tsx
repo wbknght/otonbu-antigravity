@@ -45,7 +45,7 @@ export function BranchProvider({
     allBranches,
 }: BranchProviderProps) {
     const [currentBranch, setCurrentBranch] = useState<Branch | null>(initialBranch)
-    const isSuperAdmin = userRole === 'super_admin'
+    const isSuperAdmin = userRole === 'super_admin' || userRole === 'partner'
 
     const switchBranch = useCallback((branch: Branch) => {
         setCurrentBranch(branch)

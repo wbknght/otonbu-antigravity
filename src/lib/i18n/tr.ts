@@ -96,6 +96,7 @@ export const tr = {
         role: 'Rol',
         roles: {
             super_admin: 'Süper Admin',
+            partner: 'İş Ortağı',
             branch_admin: 'Şube Admini',
             manager: 'Yönetici',
             staff: 'Personel',

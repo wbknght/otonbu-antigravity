@@ -2,7 +2,7 @@ export type JobStatus = 'queue' | 'washing' | 'drying' | 'completed'
 
 export type VehicleClass = 'small' | 'sedan' | 'suv' | 'van' | 'pickup' | 'luxury'
 
-export type StaffRole = 'super_admin' | 'branch_admin' | 'manager' | 'staff'
+export type StaffRole = 'super_admin' | 'branch_admin' | 'manager' | 'staff' | 'partner'
 
 export const VEHICLE_CLASS_LABELS: Record<VehicleClass, string> = {
     small: 'Küçük',
@@ -15,13 +15,15 @@ export const VEHICLE_CLASS_LABELS: Record<VehicleClass, string> = {
 
 export const ROLE_LABELS: Record<StaffRole, string> = {
     super_admin: 'Süper Admin',
+    partner: 'İş Ortağı',
     branch_admin: 'Şube Admini',
     manager: 'Yönetici',
     staff: 'Personel',
 }
 
 export const ROLE_HIERARCHY: Record<StaffRole, number> = {
-    super_admin: 4,
+    super_admin: 5,
+    partner: 4,
     branch_admin: 3,
     manager: 2,
     staff: 1,
