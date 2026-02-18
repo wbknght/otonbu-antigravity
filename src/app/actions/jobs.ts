@@ -123,16 +123,24 @@ export async function getAvailableServices(branchId?: string) {
                 custom_duration_min
             )
         `)
-        .or(`branch_id.is.null,branch_id.eq.${bid}`)
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
+
+    if (bid) {
+        query = query.or(`branch_id.is.null,branch_id.eq.${bid}`)
+    } else {
+        query = query.is('branch_id', null)
+    }
 
     const { data: services, error } = await query
     if (error) return []
 
     // Transform logic similar to admin.ts but geared for usage (filtering inactive)
     const available = services.map((s: any) => {
-        const bs = s.branch_services?.[0]
+        const bs = bid
+            ? s.branch_services?.find((b: any) => b.branch_id === bid)
+            : null
+
         const isActive = s.branch_id === null
             ? (bs ? bs.is_active : true)
             : s.is_active

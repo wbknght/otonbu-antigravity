@@ -127,9 +127,14 @@ export async function getServices(branchId?: string) {
                 custom_duration_min
             )
         `)
-        .or(`branch_id.is.null,branch_id.eq.${bid}`)
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
+
+    if (bid) {
+        query = query.or(`branch_id.is.null,branch_id.eq.${bid}`)
+    } else {
+        query = query.is('branch_id', null)
+    }
 
     const { data: services, error } = await query
     if (error) return { error: error.message, data: [] }
@@ -147,7 +152,9 @@ export async function getServices(branchId?: string) {
         // If I am BranchAdmin of B1, I only see branch_services for B1. 
         // So `s.branch_services[0]` should be my settings.
 
-        const bs = s.branch_services?.[0]
+        const bs = bid
+            ? s.branch_services?.find((b: any) => b.branch_id === bid)
+            : null
 
         return {
             ...s,
