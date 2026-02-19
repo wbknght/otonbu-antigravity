@@ -274,7 +274,8 @@ export async function createJob(
     // 0. Get price from pricing rules for package × vehicle class
     const { resolvePrice } = await import('@/lib/pricing')
     const priceResult = await resolvePrice(packageId, vehicleClassId)
-    const price = priceResult.amount_krs
+    // amount_krs is in kuruş (cents), divide by 100 to get TL
+    const price = priceResult.amount_krs / 100
 
     // Get vehicle class key from ID for car record
     const { data: vcData } = await supabase

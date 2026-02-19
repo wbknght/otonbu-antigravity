@@ -41,7 +41,8 @@ export function AddJobButton({ packages, vehicleClasses }: AddJobProps) {
                 return
             }
             const result = await resolvePrice(selectedPackageId, selectedVehicleClassId)
-            setCalculatedPrice(result.found ? result.amount_krs : null)
+            // amount_krs is in kuruş (cents), divide by 100 to get TL
+            setCalculatedPrice(result.found ? result.amount_krs / 100 : null)
         }
         fetchPrice()
     }, [selectedPackageId, selectedVehicleClassId])
