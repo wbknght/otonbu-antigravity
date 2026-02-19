@@ -1,36 +1,8 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { StaffRole } from '@/types'
-
-// ─── Types ───
-
-export type StatsPeriod = 'last7days' | 'thisWeek' | 'thisMonth' | 'lastMonth' | 'all'
-
-export interface DateRange {
-    start: string // ISO date string
-    end: string   // ISO date string
-}
-
-export interface BranchStats {
-    totalJobs: number
-    revenue: number
-    pendingRevenue: number
-    avgJobValue: number
-    byBrand: { make: string | null; count: number }[]
-    byService: { name: string | null; count: number }[]
-    byVehicleClass: { class: string; count: number }[]
-}
-
-export interface WorkerStats {
-    workers: {
-        userId: string
-        fullName: string
-        claimed: number
-        completed: number
-        completionRate: number
-    }[]
-}
+import { StaffRole, StatsPeriod, BranchStats, WorkerStats } from '@/types'
+import { getDateRange } from '@/lib/stats-utils'
 
 // ─── Session Helper ───
 
@@ -58,64 +30,6 @@ async function getStaffSession() {
     }
 }
 
-// ─── Date Range Helper ───
-
-export function getDateRange(period: StatsPeriod, customRange?: { start: string; end: string }): DateRange {
-    const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-    switch (period) {
-        case 'last7days': {
-            const start = new Date(today)
-            start.setDate(start.getDate() - 7)
-            return {
-                start: start.toISOString().split('T')[0],
-                end: today.toISOString().split('T')[0],
-            }
-        }
-        case 'thisWeek': {
-            const start = new Date(today)
-            const day = start.getDay()
-            const diff = start.getDate() - day + (day === 0 ? -6 : 1) // Monday
-            start.setDate(diff)
-            return {
-                start: start.toISOString().split('T')[0],
-                end: today.toISOString().split('T')[0],
-            }
-        }
-        case 'thisMonth': {
-            const start = new Date(today.getFullYear(), today.getMonth(), 1)
-            return {
-                start: start.toISOString().split('T')[0],
-                end: today.toISOString().split('T')[0],
-            }
-        }
-        case 'lastMonth': {
-            const start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-            const end = new Date(today.getFullYear(), today.getMonth(), 0)
-            return {
-                start: start.toISOString().split('T')[0],
-                end: end.toISOString().split('T')[0],
-            }
-        }
-        case 'all': {
-            return {
-                start: '2000-01-01',
-                end: '2100-12-31',
-            }
-        }
-        case 'custom':
-        default:
-            if (customRange) {
-                return customRange
-            }
-            return {
-                start: '2000-01-01',
-                end: '2100-12-31',
-            }
-    }
-}
-
 // ─── Branch Stats ───
 
 export async function getBranchStats(
@@ -126,7 +40,6 @@ export async function getBranchStats(
     const { supabase } = await getStaffSession()
     const range = getDateRange(period, customRange)
 
-    // Get completed jobs within date range
     const { data: jobs, error } = await supabase
         .from('jobs')
         .select(`
@@ -162,7 +75,6 @@ export async function getBranchStats(
     const pendingRevenue = jobs.filter(j => j.payment_status === 'pending').reduce((sum, j) => sum + (j.price || 0), 0)
     const avgJobValue = totalJobs > 0 ? revenue / totalJobs : 0
 
-    // Group by brand
     const brandMap = new Map<string | null, number>()
     jobs.forEach(job => {
         const make = job.cars?.make || 'Bilinmeyen'
@@ -172,7 +84,6 @@ export async function getBranchStats(
         .map(([make, count]) => ({ make, count }))
         .sort((a, b) => b.count - a.count)
 
-    // Group by service
     const serviceMap = new Map<string | null, number>()
     jobs.forEach(job => {
         const name = job.services?.name || 'Bilinmiyor'
@@ -182,7 +93,6 @@ export async function getBranchStats(
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count)
 
-    // Group by vehicle class
     const vcMap = new Map<string, number>()
     const vcLabels: Record<string, string> = {
         small: 'Küçük',
@@ -222,7 +132,6 @@ export async function getWorkerStats(
     const { supabase } = await getStaffSession()
     const range = getDateRange(period, customRange)
 
-    // Get all staff for the branch (staff, manager, branch_admin)
     const { data: staff } = await supabase
         .from('staff_profiles')
         .select('user_id, full_name')
@@ -236,7 +145,6 @@ export async function getWorkerStats(
 
     const userIds = staff.map(s => s.user_id)
 
-    // Get jobs claimed by these users (completed within range)
     const { data: claimedJobs } = await supabase
         .from('jobs')
         .select('assigned_to')
@@ -246,7 +154,6 @@ export async function getWorkerStats(
         .lte('closed_at', range.end + 'T23:59:59')
         .in('assigned_to', userIds)
 
-    // Get completions from job_status_history
     const { data: completions } = await supabase
         .from('job_status_history')
         .select('actor_user_id')
@@ -256,24 +163,20 @@ export async function getWorkerStats(
         .lte('created_at', range.end + 'T23:59:59')
         .in('actor_user_id', userIds)
 
-    // Build stats per worker
     const claimedMap = new Map<string, number>()
     const completedMap = new Map<string, number>()
 
-    // Initialize
     staff.forEach(s => {
         claimedMap.set(s.user_id, 0)
         completedMap.set(s.user_id, 0)
     })
 
-    // Count claimed
     claimedJobs?.forEach(job => {
         if (job.assigned_to) {
             claimedMap.set(job.assigned_to, (claimedMap.get(job.assigned_to) || 0) + 1)
         }
     })
 
-    // Count completed
     completions?.forEach(c => {
         if (c.actor_user_id) {
             completedMap.set(c.actor_user_id, (completedMap.get(c.actor_user_id) || 0) + 1)
@@ -293,7 +196,6 @@ export async function getWorkerStats(
         }
     })
 
-    // Sort by completed (desc)
     workers.sort((a, b) => b.completed - a.completed)
 
     return { workers }
