@@ -157,7 +157,7 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION public.claim_job(p_job_id uuid, p_user_id uuid)
 RETURNS boolean AS $$
-DECLARE v_updated boolean;
+DECLARE v_updated integer;
 BEGIN
     UPDATE jobs SET assigned_to = p_user_id, assigned_by = p_user_id, assigned_at = now()
     WHERE id = p_job_id AND assigned_to IS NULL AND status = 'queue';
