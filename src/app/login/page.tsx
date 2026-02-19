@@ -20,12 +20,12 @@ export default async function LoginPage({
                         priority
                     />
                     <h1 className="mt-6 text-2xl font-bold tracking-tight text-white">Giriş Yap</h1>
-                    <p className="mt-2 text-sm text-zinc-400">
-                        Otonbu&apos;ya erişmek için
+                    <p className="mt-4 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-300">
+                        Bu sistem kapalıdır. Sadece yöneticiler tarafından kayıt edilmiş kullanıcılar giriş yapabilir.
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6">
+                <form className="mt-6 space-y-6">
                     <div className="space-y-4 rounded-md shadow-sm">
                         <div>
                             <label htmlFor="email-address" className="sr-only">

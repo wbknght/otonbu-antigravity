@@ -42,6 +42,7 @@ export async function getJobs(branchId?: string) {
         .select(`
             *,
             services ( name ),
+            packages ( name ),
             cars ( id, plate_number, vehicle_class, make, model, color, has_damage ),
             customers ( id, name, phone )
         `)
@@ -88,6 +89,7 @@ export async function getArchivedJobs(search?: string) {
         .select(`
             *,
             services ( name ),
+            packages ( name ),
             cars ( id, plate_number, vehicle_class, make, model, color, has_damage ),
             customers ( id, name, phone )
         `, { count: 'exact' })

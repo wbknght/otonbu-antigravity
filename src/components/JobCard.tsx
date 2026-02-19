@@ -151,7 +151,7 @@ export function JobCard({ job }: JobCardProps) {
                 </div>
 
                 <div className="text-sm text-zinc-400">
-                    {job.services?.name || 'Bilinmeyen Hizmet'}
+                    {job.packages?.name || job.services?.name || 'Bilinmeyen Hizmet'}
                 </div>
 
                 {/* Row 3: Status + Actions */}

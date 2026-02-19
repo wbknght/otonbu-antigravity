@@ -54,7 +54,7 @@ export default async function HistoryPage({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {job.services?.name}
+                                            {job.packages?.name || job.services?.name || '—'}
                                         </td>
                                         <td className="px-6 py-4 font-mono">
                                             ₺{job.price ?? job.services?.price ?? 0}

@@ -50,7 +50,8 @@ export async function getBranchStats(
             car_id,
             service_id,
             cars ( make, vehicle_class ),
-            services ( name )
+            services ( name ),
+            packages ( name )
         `)
         .eq('branch_id', branchId)
         .not('closed_at', 'is', null)
@@ -80,6 +81,7 @@ export async function getBranchStats(
         service_id: string | null
         cars: { make: string | null; vehicle_class: string } | null
         services: { name: string } | null
+        packages: { name: string } | null
     }[]
 
     const totalJobs = jobsTyped.length
@@ -98,7 +100,7 @@ export async function getBranchStats(
 
     const serviceMap = new Map<string | null, number>()
     jobsTyped.forEach(job => {
-        const name = job.services?.name || 'Bilinmiyor'
+        const name = job.packages?.name || job.services?.name || 'Bilinmiyor'
         serviceMap.set(name, (serviceMap.get(name) || 0) + 1)
     })
     const byService = Array.from(serviceMap.entries())

@@ -44,7 +44,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h2 className="text-xl font-bold text-white">Ödeme Al</h2>
-                        <p className="text-sm text-zinc-400">{job.plate_number} • {job.services?.name}</p>
+                        <p className="text-sm text-zinc-400">{job.plate_number} • {job.packages?.name || job.services?.name || 'Bilinmeyen Hizmet'}</p>
                     </div>
                     <button onClick={onClose} className="p-1 hover:bg-zinc-800 rounded">
                         <X className="w-5 h-5 text-zinc-400" />

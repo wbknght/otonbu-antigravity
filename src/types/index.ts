@@ -115,6 +115,9 @@ export interface Job {
         name: string
         price?: number
     }
+    packages?: {
+        name: string
+    }
     cars?: Car
     customers?: Customer
     // Joined staff name for display
