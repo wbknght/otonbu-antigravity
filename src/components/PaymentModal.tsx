@@ -62,7 +62,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-3 pl-8 pr-4 text-white text-xl font-mono focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-3 pl-8 pr-4 text-white text-xl font-mono focus:ring-2 focus:ring-brand focus:border-transparent outline-none"
                             />
                         </div>
                     </div>
@@ -89,7 +89,7 @@ export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
                                 className={cn(
                                     "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
                                     method === 'card'
-                                        ? "bg-blue-900/30 border-blue-500 text-blue-400"
+                                        ? "bg-brand/20 border-brand text-brand"
                                         : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700"
                                 )}
                             >

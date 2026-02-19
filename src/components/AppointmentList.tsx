@@ -59,7 +59,7 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
                         </div>
                         <span className={cn(
                             "px-2 py-1 rounded text-xs font-medium border",
-                            apt.status === 'booked' ? "bg-blue-900/20 text-blue-400 border-blue-900/50" :
+                            apt.status === 'booked' ? "bg-brand/20 text-brand border-brand/50" :
                                 apt.status === 'completed' ? "bg-green-900/20 text-green-400 border-green-900/50" :
                                     "bg-zinc-800 text-zinc-400 border-zinc-700"
                         )}>

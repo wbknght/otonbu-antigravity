@@ -26,7 +26,7 @@ export function BranchesClient({ initialBranches }: { initialBranches: Branch[] 
                 <h1 className="text-2xl font-bold text-white">Şubeler</h1>
                 <button
                     onClick={() => { setEditing(null); setModalOpen(true) }}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all"
+                    className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-5 py-2.5 rounded-xl font-medium transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     Yeni Şube
@@ -44,7 +44,7 @@ export function BranchesClient({ initialBranches }: { initialBranches: Branch[] 
                         )}
                     >
                         <div className="bg-zinc-800 rounded-full p-3">
-                            <Building2 className="w-6 h-6 text-blue-400" />
+                            <Building2 className="w-6 h-6 text-brand" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">

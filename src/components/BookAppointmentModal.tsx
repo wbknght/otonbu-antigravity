@@ -52,7 +52,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                         <input
                             name="customerName"
                             required
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-brand outline-none"
                         />
                     </div>
 
@@ -63,7 +63,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                         <input
                             name="customerPhone"
                             type="tel"
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-brand outline-none"
                         />
                     </div>
 
@@ -73,7 +73,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                         </label>
                         <input
                             name="plateNumber"
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white uppercase font-mono focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white uppercase font-mono focus:ring-2 focus:ring-brand outline-none"
                         />
                     </div>
 
@@ -85,7 +85,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                             name="scheduledTime"
                             type="datetime-local"
                             required
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-brand outline-none"
                         />
                     </div>
 
@@ -96,7 +96,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                         <select
                             name="serviceTypeId"
                             required
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-brand outline-none"
                         >
                             <option value="">Hizmet seçin...</option>
                             {services.map((st) => (
@@ -112,7 +112,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                             <input
                                 type="checkbox"
                                 name="isValet"
-                                className="w-5 h-5 rounded border-zinc-700 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+                                className="w-5 h-5 rounded border-zinc-700 bg-zinc-800 text-brand focus:ring-brand"
                             />
                             <span className="text-white font-medium">Vale Hizmeti İste</span>
                         </label>
@@ -121,7 +121,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                             <input
                                 name="valetAddress"
                                 placeholder="Alım Adresi (Vale seçildiyse)"
-                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-brand outline-none text-sm"
                             />
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export function BookAppointmentModal({ isOpen, onClose, services }: BookAppointm
                         disabled={isLoading}
                         className={cn(
                             "w-full py-3 rounded-lg font-bold text-lg transition-all mt-4",
-                            "bg-blue-600 hover:bg-blue-500 text-white",
+                            "bg-brand hover:bg-brand-hover text-white",
                             isLoading && "opacity-50 cursor-not-allowed"
                         )}
                     >

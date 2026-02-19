@@ -153,7 +153,7 @@ export function PricingClient({
                 <h1 className="text-2xl font-bold text-white">{tr.pricing.title}</h1>
                 <button
                     onClick={() => { setEditingList(null); setListModalOpen(true) }}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all"
+                    className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-5 py-2.5 rounded-xl font-medium transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     {tr.pricing.addList}
@@ -210,7 +210,7 @@ export function PricingClient({
                                     <span className="text-xs font-medium text-zinc-400 uppercase">{tr.pricing.rules}</span>
                                     <button
                                         onClick={() => openRuleModal()}
-                                        className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                                        className="flex items-center gap-1 text-xs text-brand hover:text-brand/80 transition-colors"
                                     >
                                         <Plus className="w-3 h-3" /> {tr.pricing.addRule}
                                     </button>
@@ -301,7 +301,7 @@ export function PricingClient({
                                 <select
                                     value={rulePackageId}
                                     onChange={e => setRulePackageId(e.target.value)}
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
                                     {packages.map(p => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -313,7 +313,7 @@ export function PricingClient({
                                 <select
                                     value={ruleVcId}
                                     onChange={e => setRuleVcId(e.target.value)}
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
                                     {vehicleClasses.map(vc => (
                                         <option key={vc.id} value={vc.id}>{vc.label}</option>
@@ -327,7 +327,7 @@ export function PricingClient({
                                     value={ruleAmount}
                                     onChange={e => setRuleAmount(e.target.value)}
                                     placeholder="150.00"
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand font-mono"
                                 />
                             </div>
                         </div>
@@ -336,7 +336,7 @@ export function PricingClient({
                             <button onClick={() => setRuleModalOpen(false)} className="px-5 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800">
                                 {tr.common.cancel}
                             </button>
-                            <button onClick={saveRule} disabled={isPending} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50">
+                            <button onClick={saveRule} disabled={isPending} className="bg-brand hover:bg-brand-hover text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50">
                                 {isPending ? tr.common.saving : tr.common.save}
                             </button>
                         </div>

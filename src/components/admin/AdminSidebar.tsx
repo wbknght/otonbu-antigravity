@@ -69,11 +69,11 @@ export function AdminSidebar() {
                                     className={cn(
                                         'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                                         isActive
-                                            ? 'bg-blue-600/20 text-white border border-blue-500/30'
+                                            ? 'bg-brand/20 text-white border border-brand/30'
                                             : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                                     )}
                                 >
-                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-blue-400' : 'text-zinc-500')} />
+                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-brand' : 'text-zinc-500')} />
                                     {item.name}
                                 </Link>
                             )
@@ -100,11 +100,11 @@ export function AdminSidebar() {
                                     className={cn(
                                         'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                                         isActive
-                                            ? 'bg-blue-600/20 text-white border border-blue-500/30'
+                                            ? 'bg-brand/20 text-white border border-brand/30'
                                             : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                                     )}
                                 >
-                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-blue-400' : 'text-zinc-500')} />
+                                    <item.icon className={cn('w-4 h-4', isActive ? 'text-brand' : 'text-zinc-500')} />
                                     {item.name}
                                 </Link>
                             )

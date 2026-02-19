@@ -36,12 +36,12 @@ export function GlobalSearch() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Plaka ile ara..."
                 className={cn(
-                    "w-full bg-zinc-800 border border-zinc-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all",
+                    "w-full bg-zinc-800 border border-zinc-700 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:ring-2 focus:ring-brand outline-none transition-all",
                     isPending && "opacity-50"
                 )}
             />
             {isPending && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500 animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand animate-spin" />
             )}
         </form>
     )

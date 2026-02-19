@@ -158,7 +158,7 @@ export function StatsClient({ initialBranch }: { initialBranch: Branch | null })
                                 <Calendar className="w-4 h-4" />
                                 Ortalama Değer
                             </div>
-                            <div className="text-2xl font-bold text-blue-400">
+                            <div className="text-2xl font-bold text-brand">
                                 ₺{branchStats?.avgJobValue ? Math.round(branchStats.avgJobValue).toLocaleString('tr-TR') : 0}
                             </div>
                         </div>

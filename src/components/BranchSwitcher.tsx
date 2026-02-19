@@ -44,7 +44,7 @@ export function BranchSwitcher({ basePath = '/admin' }: BranchSwitcherProps) {
         if (currentBranch) {
             return (
                 <div className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 bg-zinc-800/50 rounded-lg border border-zinc-700">
-                    <Building2 className="w-4 h-4 text-blue-400" />
+                    <Building2 className="w-4 h-4 text-brand" />
                     <span className="truncate">{currentBranch.name}</span>
                 </div>
             )
@@ -67,7 +67,7 @@ export function BranchSwitcher({ basePath = '/admin' }: BranchSwitcherProps) {
                     "text-zinc-200 transition-colors"
                 )}
             >
-                <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
+                <Building2 className="w-4 h-4 text-brand shrink-0" />
                 <span className="truncate flex-1 text-left">
                     {selectedBranch?.name || 'Şube Seç'}
                 </span>
@@ -87,7 +87,7 @@ export function BranchSwitcher({ basePath = '/admin' }: BranchSwitcherProps) {
                                 "w-full px-3 py-2.5 text-left text-sm transition-colors",
                                 "hover:bg-zinc-700/50",
                                 selectedBranchId === branch.id || (!selectedBranchId && currentBranch?.id === branch.id)
-                                    ? "text-blue-400 bg-blue-500/10"
+                                    ? "text-brand bg-brand/10"
                                     : "text-zinc-300"
                             )}
                         >

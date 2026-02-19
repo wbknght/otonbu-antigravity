@@ -24,7 +24,7 @@ const roleBadgeColors: Record<string, string> = {
     super_admin: 'bg-purple-900/30 text-purple-400',
     branch_admin: 'bg-red-900/30 text-red-400',
     manager: 'bg-yellow-900/30 text-yellow-400',
-    staff: 'bg-blue-900/30 text-blue-400',
+    staff: 'bg-brand/20 text-brand',
     partner: 'bg-indigo-900/30 text-indigo-400',
 }
 
@@ -98,7 +98,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                 <h1 className="text-2xl font-bold text-white">{tr.staff.title}</h1>
                 <button
                     onClick={() => { setEditing(null); setModalOpen(true) }}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all"
+                    className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-5 py-2.5 rounded-xl font-medium transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     {tr.staff.addNew}
@@ -113,7 +113,7 @@ export function StaffClient({ initialStaff, branchId }: { initialStaff: StaffPro
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder={tr.common.search}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand"
                 />
             </div>
 

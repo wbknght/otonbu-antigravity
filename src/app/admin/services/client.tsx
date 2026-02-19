@@ -76,7 +76,7 @@ export function ServicesClient({ initialServices }: { initialServices: Service[]
                 <h1 className="text-2xl font-bold text-white">{tr.services.title}</h1>
                 <button
                     onClick={openCreate}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all"
+                    className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-5 py-2.5 rounded-xl font-medium transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     {tr.services.addNew}
@@ -92,7 +92,7 @@ export function ServicesClient({ initialServices }: { initialServices: Service[]
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={tr.common.search}
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand"
                     />
                 </div>
                 <div className="flex bg-zinc-800 rounded-xl border border-zinc-700 overflow-hidden">
@@ -103,7 +103,7 @@ export function ServicesClient({ initialServices }: { initialServices: Service[]
                             className={cn(
                                 'px-4 py-2 text-xs font-medium transition-all',
                                 filter === f
-                                    ? 'bg-blue-600/30 text-blue-300'
+                                    ? 'bg-brand/30 text-brand'
                                     : 'text-zinc-400 hover:text-white'
                             )}
                         >
@@ -150,7 +150,7 @@ export function ServicesClient({ initialServices }: { initialServices: Service[]
                                         {(service.effective_is_active ?? service.is_active) ? tr.common.active : tr.common.inactive}
                                     </span>
                                     {!service.branch_id && (
-                                        <span className="ml-2 text-xs px-2 py-1 rounded-full bg-blue-900/30 text-blue-400 border border-blue-800">
+                                        <span className="ml-2 text-xs px-2 py-1 rounded-full bg-brand/20 text-brand border border-brand/50">
                                             Evrensel
                                         </span>
                                     )}

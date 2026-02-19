@@ -37,7 +37,7 @@ export default async function LoginPage({
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="relative block w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white placeholder-zinc-500 ring-1 ring-inset ring-zinc-700 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
+                                className="relative block w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white placeholder-zinc-500 ring-1 ring-inset ring-zinc-700 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6"
                                 placeholder="E-posta adresi"
                             />
                         </div>
@@ -51,7 +51,7 @@ export default async function LoginPage({
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="relative block w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white placeholder-zinc-500 ring-1 ring-inset ring-zinc-700 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
+                                className="relative block w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white placeholder-zinc-500 ring-1 ring-inset ring-zinc-700 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6"
                                 placeholder="Şifre"
                             />
                         </div>
@@ -60,7 +60,7 @@ export default async function LoginPage({
                     <div className="flex flex-col gap-3">
                         <button
                             formAction={login}
-                            className="group relative flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                            className="group relative flex w-full justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                         >
                             Giriş Yap
                         </button>

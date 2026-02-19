@@ -20,7 +20,7 @@ interface AuditEntry {
 
 const actionColors: Record<string, string> = {
     CREATE: 'bg-green-900/30 text-green-400',
-    UPDATE: 'bg-blue-900/30 text-blue-400',
+    UPDATE: 'bg-brand/20 text-brand',
     DELETE: 'bg-red-900/30 text-red-400',
     TOGGLE: 'bg-yellow-900/30 text-yellow-400',
     SET_ITEMS: 'bg-purple-900/30 text-purple-400',
@@ -138,7 +138,7 @@ export function AuditClient({
                         <button
                             onClick={loadMore}
                             disabled={isPending}
-                            className="text-xs text-blue-400 hover:text-blue-300 disabled:opacity-50"
+                            className="text-xs text-brand hover:text-brand/80 disabled:opacity-50"
                         >
                             {isPending ? tr.common.loading : `Daha fazla yükle (${totalCount - logs.length} kalan)`}
                         </button>

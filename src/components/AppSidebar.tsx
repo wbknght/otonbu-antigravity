@@ -148,14 +148,14 @@ export function AppSidebar() {
                                         'group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all',
                                         'min-h-[48px]', // Apple HIG touch target
                                         active
-                                            ? 'bg-blue-600/20 text-white border border-blue-500/30'
+                                            ? 'bg-brand/20 text-white border border-brand/30'
                                             : 'text-zinc-400 hover:bg-zinc-800 hover:text-white active:bg-zinc-700'
                                     )}
                                 >
                                     <item.icon
                                         className={cn(
                                             'mr-3 h-5 w-5 flex-shrink-0',
-                                            active ? 'text-blue-500' : 'text-zinc-500 group-hover:text-white'
+                                            active ? 'text-brand' : 'text-zinc-500 group-hover:text-white'
                                         )}
                                     />
                                     {item.name}

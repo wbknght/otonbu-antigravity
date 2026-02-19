@@ -111,7 +111,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                         value={make}
                                         onChange={e => setMake(e.target.value)}
                                         placeholder="Toyota"
-                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none"
                                     />
                                 </div>
                                 <div>
@@ -120,7 +120,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                         value={model}
                                         onChange={e => setModel(e.target.value)}
                                         placeholder="Corolla"
-                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none"
                                     />
                                 </div>
                             </div>
@@ -131,7 +131,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                     value={color}
                                     onChange={e => setColor(e.target.value)}
                                     placeholder="Beyaz"
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none"
                                 />
                             </div>
 
@@ -142,7 +142,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                     onChange={e => setNotes(e.target.value)}
                                     placeholder="Ek bilgi..."
                                     rows={3}
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none resize-none"
                                 />
                             </div>
 
@@ -178,7 +178,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                     value={custName}
                                     onChange={e => setCustName(e.target.value)}
                                     placeholder="Müşteri adı"
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none"
                                 />
                             </div>
                             <div>
@@ -188,7 +188,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                                     value={custEmail}
                                     onChange={e => setCustEmail(e.target.value)}
                                     placeholder="ornek@email.com"
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-brand outline-none"
                                 />
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export function JobDetailsDrawer({ isOpen, onClose, jobId, car, customer }: JobD
                             "flex-1 py-3 rounded-xl font-bold transition-all min-h-[48px]",
                             saved
                                 ? "bg-green-600 text-white"
-                                : "bg-blue-600 hover:bg-blue-500 text-white active:scale-95",
+                                : "bg-brand hover:bg-brand-hover text-white active:scale-95",
                             saving && "opacity-50 cursor-not-allowed"
                         )}
                     >

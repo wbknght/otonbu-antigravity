@@ -82,7 +82,7 @@ export function FormModal({ isOpen, onClose, title, fields, initialData, onSubmi
                                         type="checkbox"
                                         checked={data[field.key] ?? false}
                                         onChange={e => handleChange(field.key, e.target.checked)}
-                                        className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-500 focus:ring-blue-500"
+                                        className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-brand focus:ring-brand"
                                     />
                                     <span className="text-sm font-medium text-zinc-300">{field.label}</span>
                                 </label>
@@ -98,13 +98,13 @@ export function FormModal({ isOpen, onClose, title, fields, initialData, onSubmi
                                             onChange={e => handleChange(field.key, e.target.value)}
                                             placeholder={field.placeholder}
                                             rows={3}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand resize-none"
                                         />
                                     ) : field.type === 'select' ? (
                                         <select
                                             value={data[field.key] ?? ''}
                                             onChange={e => handleChange(field.key, e.target.value)}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand"
                                         >
                                             {field.options?.map(opt => (
                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -117,7 +117,7 @@ export function FormModal({ isOpen, onClose, title, fields, initialData, onSubmi
                                             onChange={e => handleChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
                                             placeholder={field.placeholder}
                                             required={field.required}
-                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand"
                                         />
                                     )}
                                 </>
@@ -137,7 +137,7 @@ export function FormModal({ isOpen, onClose, title, fields, initialData, onSubmi
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50 transition-all"
+                            className="bg-brand hover:bg-brand-hover text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50 transition-all"
                         >
                             {isPending ? tr.common.saving : tr.common.save}
                         </button>

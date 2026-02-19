@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Brand color from logo #ff0e4c */
+@theme {
+  --color-brand: #ff0e4c;
+  --color-brand-hover: #e00d44;
+}
+
 /* ===== Tablet / Touch Optimizations ===== */
 
 /* Prevent 300ms tap delay & double-tap-to-zoom on touch devices */

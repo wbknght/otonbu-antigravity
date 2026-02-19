@@ -123,7 +123,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                 <h1 className="text-2xl font-bold text-white">{tr.packages.title}</h1>
                 <button
                     onClick={openCreate}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all"
+                    className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-5 py-2.5 rounded-xl font-medium transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     {tr.packages.addNew}
@@ -139,7 +139,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={tr.common.search}
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand"
                     />
                 </div>
                 <div className="flex bg-zinc-800 rounded-xl border border-zinc-700 overflow-hidden">
@@ -149,7 +149,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                             onClick={() => setFilter(f)}
                             className={cn(
                                 'px-4 py-2 text-xs font-medium transition-all',
-                                filter === f ? 'bg-blue-600/30 text-blue-300' : 'text-zinc-400 hover:text-white'
+                                filter === f ? 'bg-brand/30 text-brand' : 'text-zinc-400 hover:text-white'
                             )}
                         >
                             {f === 'all' ? tr.common.all : f === 'active' ? tr.common.active : tr.common.inactive}
@@ -183,7 +183,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                         {pkg.package_items.length === 0 ? (
                                             <button
                                                 onClick={() => openItems(pkg)}
-                                                className="text-xs px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors"
+                                                className="text-xs px-2 py-1 rounded bg-brand/20 text-brand hover:bg-brand/30 transition-colors"
                                             >
                                                 + Hizmet ekle
                                             </button>
@@ -195,7 +195,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                                         className={cn(
                                                             'text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1',
                                                             pi.is_base
-                                                                ? 'bg-blue-900/40 text-blue-300 border border-blue-800/50'
+                                                                ? 'bg-brand/30 text-brand border border-brand/50'
                                                                 : 'bg-zinc-700/50 text-zinc-400'
                                                         )}
                                                     >
@@ -204,7 +204,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                                 ))}
                                                 <button
                                                     onClick={() => openItems(pkg)}
-                                                    className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 hover:text-blue-400 hover:bg-zinc-700 transition-colors"
+                                                    className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 hover:text-brand hover:bg-zinc-700 transition-colors"
                                                 >
                                                     + Ekle
                                                 </button>
@@ -224,7 +224,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                     <div className="flex justify-end gap-1">
                                         <button
                                             onClick={() => openItems(pkg)}
-                                            className="p-2 text-zinc-400 hover:text-blue-400 hover:bg-zinc-700 rounded-lg transition-all"
+                                            className="p-2 text-zinc-400 hover:text-brand hover:bg-zinc-700 rounded-lg transition-all"
                                             title={tr.packages.items}
                                         >
                                             <Wrench className="w-4 h-4" />
@@ -278,7 +278,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                         className={cn(
                                             'flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer transition-all',
                                             selected
-                                                ? 'bg-blue-600/10 border-blue-500/30'
+                                                ? 'bg-brand/10 border-brand/30'
                                                 : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600'
                                         )}
                                         onClick={() => toggleItem(svc.id)}
@@ -288,7 +288,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                                 type="checkbox"
                                                 checked={!!selected}
                                                 onChange={() => { }}
-                                                className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-blue-500"
+                                                className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-brand"
                                             />
                                             <span className="text-sm text-white">{svc.name}</span>
                                         </div>
@@ -298,7 +298,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                                                 className={cn(
                                                     'text-[10px] px-2 py-1 rounded font-medium transition-all',
                                                     selected.is_base
-                                                        ? 'bg-blue-600 text-white'
+                                                        ? 'bg-brand text-white'
                                                         : 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
                                                 )}
                                             >
@@ -320,7 +320,7 @@ export function PackagesClient({ initialPackages, services }: { initialPackages:
                             <button
                                 onClick={saveItems}
                                 disabled={isPending}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50 transition-all"
+                                className="bg-brand hover:bg-brand-hover text-white px-6 py-2.5 rounded-xl font-medium disabled:opacity-50 transition-all"
                             >
                                 {isPending ? tr.common.saving : tr.common.save}
                             </button>

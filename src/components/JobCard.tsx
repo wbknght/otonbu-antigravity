@@ -198,9 +198,9 @@ export function JobCard({ job }: JobCardProps) {
                                     className={cn(
                                         "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium",
                                         "min-h-[44px] min-w-[44px]",
-                                        "bg-blue-600/20 text-blue-400",
-                                        "hover:bg-blue-600 hover:text-white",
-                                        "active:bg-blue-700 active:scale-95",
+                                        "bg-brand/20 text-brand",
+                                        "hover:bg-brand hover:text-white",
+                                        "active:bg-brand-hover active:scale-95",
                                         "transition-all"
                                     )}
                                     title="Ödeme Al"

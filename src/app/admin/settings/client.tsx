@@ -57,7 +57,7 @@ export function SettingsClient({ initialSettings, branchId }: { initialSettings:
                             <button
                                 onClick={() => handleSave(setting.key)}
                                 disabled={isPending}
-                                className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 disabled:opacity-50 transition-colors"
+                                className="flex items-center gap-1 text-xs text-brand hover:text-brand/80 disabled:opacity-50 transition-colors"
                             >
                                 <Save className="w-3 h-3" />
                                 {saved === setting.key ? '✓ Kaydedildi' : tr.common.save}
@@ -70,7 +70,7 @@ export function SettingsClient({ initialSettings, branchId }: { initialSettings:
                             type="text"
                             value={values[setting.key] || ''}
                             onChange={e => setValues(prev => ({ ...prev, [setting.key]: e.target.value }))}
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-brand"
                         />
                     </div>
                 ))}
