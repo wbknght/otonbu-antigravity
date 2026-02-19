@@ -23,6 +23,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Otonbu",
   description: "Oto yıkama operasyon yönetimi",
+  icons: {
+    icon: "/favicon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
