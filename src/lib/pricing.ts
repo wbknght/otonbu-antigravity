@@ -5,6 +5,8 @@
  * Returns { amount_krs, currency, breakdown, warnings }.
  */
 
+'use server'
+
 import { createClient } from '@/utils/supabase/server'
 
 export interface PriceBreakdown {
