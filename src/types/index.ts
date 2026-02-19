@@ -95,7 +95,7 @@ export interface Customer {
 export interface Job {
     id: string
     plate_number: string
-    service_type_id: string
+    service_type_id: string // legacy - can remove later
     status: JobStatus
     payment_status: 'pending' | 'paid'
     owner_id: string | null
@@ -110,6 +110,7 @@ export interface Job {
     created_at: string
     closed_at: string | null
     price: number | null
+    package_id: string | null
     services?: {
         name: string
         price?: number

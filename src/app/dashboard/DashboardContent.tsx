@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Job, Service } from '@/types'
+import { Job } from '@/types'
 import { KanbanBoard } from '@/components/KanbanBoard'
 import { AddJobButton } from '@/components/AddJobButton'
 import { useBranch } from '@/contexts/BranchContext'
@@ -10,10 +10,11 @@ import { cn } from '@/lib/utils'
 
 interface DashboardContentProps {
     jobs: Job[]
-    services: Service[]
+    packages: { id: string; name: string; sort_order: number }[]
+    vehicleClasses: { id: string; key: string; label: string }[]
 }
 
-export function DashboardContent({ jobs: allJobs, services }: DashboardContentProps) {
+export function DashboardContent({ jobs: allJobs, packages, vehicleClasses }: DashboardContentProps) {
     const { userId } = useBranch()
     const [showMyOnly, setShowMyOnly] = useState(false)
 
@@ -39,7 +40,7 @@ export function DashboardContent({ jobs: allJobs, services }: DashboardContentPr
                         {showMyOnly ? 'Sadece benim işlerim' : 'Tüm işler'}
                     </button>
                 </div>
-                <AddJobButton services={services} />
+                <AddJobButton packages={packages} vehicleClasses={vehicleClasses} />
             </div>
 
             <div className="flex-1 min-h-0">

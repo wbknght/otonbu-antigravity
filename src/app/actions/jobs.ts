@@ -179,6 +179,33 @@ export async function getAvailableServices(branchId?: string) {
     return available
 }
 
+// ─── Packages & Vehicle Classes for Job Creation ───
+
+export async function getPackagesAndVehicleClasses(branchId?: string) {
+    const { supabase, branchId: myBranch } = await getStaffSession()
+    const bid = branchId || myBranch
+
+    // Fetch packages
+    const { data: packages } = await supabase
+        .from('packages')
+        .select('id, name, sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .order('name', { ascending: true })
+
+    // Fetch vehicle classes
+    const { data: vehicleClasses } = await supabase
+        .from('vehicle_classes')
+        .select('id, key, label')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+
+    return {
+        packages: packages || [],
+        vehicleClasses: vehicleClasses || [],
+    }
+}
+
 // ─── Car & Customer Lookup ───
 
 export async function lookupCarByPlate(plate: string) {
@@ -230,8 +257,8 @@ export async function lookupCustomerByPhone(phone: string) {
 
 export async function createJob(
     plateNumber: string,
-    serviceId: string,
-    vehicleClass: VehicleClass,
+    packageId: string,
+    vehicleClassId: string,
     phone?: string,
     branchIdOverride?: string,
 ) {
@@ -239,20 +266,15 @@ export async function createJob(
     const branchId = isSuperAdmin ? (branchIdOverride || myBranch) : myBranch
     const plate = plateNumber.toUpperCase().trim()
 
-    if (!plate || !serviceId || !vehicleClass) {
+    if (!plate || !packageId || !vehicleClassId) {
         return { error: 'Zorunlu alanlar eksik' }
     }
     if (!branchId) return { error: 'Şube bilgisi gerekli' }
 
-    // 0. Get branch-specific price for this service
-    const { data: serviceData } = await supabase
-        .from('services')
-        .select('price, branch_services(custom_price)')
-        .eq('id', serviceId)
-        .single()
-
-    const branchService = serviceData?.branch_services?.find((b: any) => b.branch_id === branchId)
-    const price = branchService?.custom_price ?? serviceData?.price ?? 0
+    // 0. Get price from pricing rules for package × vehicle class
+    const { resolvePrice } = await import('@/lib/pricing')
+    const priceResult = await resolvePrice(packageId, vehicleClassId)
+    const price = priceResult.amount_krs
 
     // 1. Upsert car (branch-scoped)
     let query = supabase.from('cars').select('id').eq('plate_number', plate)
@@ -318,12 +340,12 @@ export async function createJob(
         }
     }
 
-    // 3. Create job with branch_id and price (frozen at creation)
+    // 3. Create job with branch_id, package_id and price (frozen at creation)
     const { data: job, error: jobError } = await supabase
         .from('jobs')
         .insert([{
             plate_number: plate,
-            service_id: serviceId,
+            package_id: packageId,
             status: 'queue',
             car_id: carId,
             customer_id: customerId,

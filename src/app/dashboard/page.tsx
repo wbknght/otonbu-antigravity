@@ -1,13 +1,13 @@
-import { getJobs, getAvailableServices } from '@/app/actions/jobs'
+import { getJobs, getPackagesAndVehicleClasses } from '@/app/actions/jobs'
 import { DashboardContent } from './DashboardContent'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
-    const [jobs, services] = await Promise.all([
+    const [jobs, { packages, vehicleClasses }] = await Promise.all([
         getJobs(),
-        getAvailableServices()
+        getPackagesAndVehicleClasses()
     ])
 
-    return <DashboardContent jobs={jobs} services={services} />
+    return <DashboardContent jobs={jobs} packages={packages} vehicleClasses={vehicleClasses} />
 }
