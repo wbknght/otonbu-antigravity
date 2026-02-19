@@ -1,4 +1,4 @@
-export type JobStatus = 'queue' | 'washing' | 'drying' | 'completed'
+export type JobStatus = 'queue' | 'washing' | 'processing' | 'drying' | 'completed'
 
 export type VehicleClass = 'small' | 'sedan' | 'suv' | 'van' | 'pickup' | 'luxury'
 
@@ -153,6 +153,7 @@ export interface Appointment {
 export const KANBAN_COLUMNS: { id: JobStatus; title: string }[] = [
     { id: 'queue', title: 'Sıra' },
     { id: 'washing', title: 'Yıkama' },
+    { id: 'processing', title: 'İşlemde' },
     { id: 'drying', title: 'Kurulama' },
     { id: 'completed', title: 'Tamamlandı' },
 ]
