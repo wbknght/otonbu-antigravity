@@ -159,7 +159,7 @@ export function StatsClient({ initialBranch }: { initialBranch: Branch | null })
                                 Ortalama Değer
                             </div>
                             <div className="text-2xl font-bold text-blue-400">
-                                ₺{branchStats?.avgJobValue?.toFixed(0)?.toLocaleString('tr-TR') || 0}
+                                ₺{branchStats?.avgJobValue ? Math.round(branchStats.avgJobValue).toLocaleString('tr-TR') : 0}
                             </div>
                         </div>
                     </div>
