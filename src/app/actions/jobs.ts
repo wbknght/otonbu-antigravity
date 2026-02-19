@@ -276,6 +276,14 @@ export async function createJob(
     const priceResult = await resolvePrice(packageId, vehicleClassId)
     const price = priceResult.amount_krs
 
+    // Get vehicle class key from ID for car record
+    const { data: vcData } = await supabase
+        .from('vehicle_classes')
+        .select('key')
+        .eq('id', vehicleClassId)
+        .single()
+    const vehicleClassKey = vcData?.key || 'sedan'
+
     // 1. Upsert car (branch-scoped)
     let query = supabase.from('cars').select('id').eq('plate_number', plate)
     query = query.eq('branch_id', branchId)
@@ -287,12 +295,12 @@ export async function createJob(
         carId = existingCar.id
         await supabase
             .from('cars')
-            .update({ vehicle_class: vehicleClass, updated_at: new Date().toISOString() })
+            .update({ vehicle_class: vehicleClassKey, updated_at: new Date().toISOString() })
             .eq('id', carId)
     } else {
         const { data: newCar, error: carError } = await supabase
             .from('cars')
-            .insert([{ plate_number: plate, vehicle_class: vehicleClass, branch_id: branchId }])
+            .insert([{ plate_number: plate, vehicle_class: vehicleClassKey, branch_id: branchId }])
             .select('id')
             .single()
 
