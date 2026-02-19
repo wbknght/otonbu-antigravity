@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
     Home,
     Calendar,
     Settings,
     LogOut,
-    CarFront,
     History,
     Menu,
     X
@@ -66,10 +66,16 @@ export function AppSidebar() {
                 >
                     <Menu className="h-6 w-6" />
                 </button>
-                <div className="flex items-center font-bold text-lg tracking-wider text-white">
-                    <CarFront className="mr-2 h-5 w-5 text-blue-500" />
-                    OTON<span className="text-blue-500">BU</span>
-                </div>
+                <Link href="/dashboard" className="flex items-center shrink-0">
+                    <Image
+                        src="/logo.png"
+                        alt="otonbu Garage"
+                        width={120}
+                        height={40}
+                        className="h-8 w-auto object-contain object-left"
+                        priority
+                    />
+                </Link>
             </div>
 
             {/* ===== Backdrop Overlay ===== */}
@@ -93,11 +99,17 @@ export function AppSidebar() {
                 )}
             >
                 {/* Header */}
-                <div className="flex h-16 items-center justify-between px-6">
-                    <div className="flex items-center font-bold text-xl tracking-wider">
-                        <CarFront className="mr-2 h-6 w-6 text-blue-500" />
-                        OTON<span className="text-blue-500">BU</span>
-                    </div>
+                <div className="flex h-16 items-center justify-between px-4">
+                    <Link href="/dashboard" className="flex items-center shrink-0">
+                        <Image
+                            src="/logo.png"
+                            alt="otonbu Garage"
+                            width={140}
+                            height={48}
+                            className="h-10 w-auto object-contain object-left"
+                            priority
+                        />
+                    </Link>
                     <button
                         onClick={() => setIsOpen(false)}
                         className="lg:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 active:bg-zinc-700"

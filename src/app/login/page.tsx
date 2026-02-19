@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { login } from './actions'
 
 export default async function LoginPage({
@@ -10,7 +11,15 @@ export default async function LoginPage({
         <div className="flex h-screen w-full items-center justify-center bg-zinc-950 px-4">
             <div className="w-full max-w-sm space-y-8 rounded-lg border border-zinc-800 bg-zinc-900 p-8 shadow-lg">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold tracking-tight text-white">Giriş Yap</h1>
+                    <Image
+                        src="/logo.png"
+                        alt="otonbu Garage"
+                        width={180}
+                        height={72}
+                        className="mx-auto h-14 w-auto object-contain"
+                        priority
+                    />
+                    <h1 className="mt-6 text-2xl font-bold tracking-tight text-white">Giriş Yap</h1>
                     <p className="mt-2 text-sm text-zinc-400">
                         Otonbu&apos;ya erişmek için
                     </p>
