@@ -109,6 +109,7 @@ export interface Job {
     completed_at: string | null
     created_at: string
     closed_at: string | null
+    price: number | null
     services?: {
         name: string
         price?: number

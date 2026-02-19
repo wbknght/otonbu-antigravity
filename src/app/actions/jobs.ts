@@ -244,6 +244,16 @@ export async function createJob(
     }
     if (!branchId) return { error: 'Şube bilgisi gerekli' }
 
+    // 0. Get branch-specific price for this service
+    const { data: serviceData } = await supabase
+        .from('services')
+        .select('price, branch_services(custom_price)')
+        .eq('id', serviceId)
+        .single()
+
+    const branchService = serviceData?.branch_services?.find((b: any) => b.branch_id === branchId)
+    const price = branchService?.custom_price ?? serviceData?.price ?? 0
+
     // 1. Upsert car (branch-scoped)
     let query = supabase.from('cars').select('id').eq('plate_number', plate)
     query = query.eq('branch_id', branchId)
@@ -308,7 +318,7 @@ export async function createJob(
         }
     }
 
-    // 3. Create job with branch_id
+    // 3. Create job with branch_id and price (frozen at creation)
     const { data: job, error: jobError } = await supabase
         .from('jobs')
         .insert([{
@@ -318,6 +328,7 @@ export async function createJob(
             car_id: carId,
             customer_id: customerId,
             branch_id: branchId,
+            price: price,
         }])
         .select(`
             *,

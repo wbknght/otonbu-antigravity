@@ -147,7 +147,7 @@ export function JobCard({ job }: JobCardProps) {
                             <span className="text-[10px] text-zinc-500">{job.cars.color}</span>
                         )}
                     </div>
-                    <span className="font-mono text-zinc-500">₺{job.services?.price}</span>
+                    <span className="font-mono text-zinc-500">₺{job.price ?? job.services?.price ?? 0}</span>
                 </div>
 
                 <div className="text-sm text-zinc-400">

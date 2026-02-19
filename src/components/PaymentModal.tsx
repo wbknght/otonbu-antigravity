@@ -15,7 +15,7 @@ interface PaymentModalProps {
 export function PaymentModal({ job, isOpen, onClose }: PaymentModalProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [method, setMethod] = useState<PaymentMethod | null>(null)
-    const [amount, setAmount] = useState<string>(job.services?.price?.toString() || '0')
+    const [amount, setAmount] = useState<string>((job.price ?? job.services?.price ?? 0).toString())
 
     if (!isOpen) return null
 
