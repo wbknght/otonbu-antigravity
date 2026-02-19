@@ -10,3 +10,4 @@ export default async function DashboardPage() {
     ])
 
     return <DashboardContent jobs={jobs} services={services} />
+}
