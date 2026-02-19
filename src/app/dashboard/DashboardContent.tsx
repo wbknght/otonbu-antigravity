@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Job } from '@/types'
+import { Job, Service } from '@/types'
 import { KanbanBoard } from '@/components/KanbanBoard'
 import { AddJobButton } from '@/components/AddJobButton'
 import { useBranch } from '@/contexts/BranchContext'
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 
 interface DashboardContentProps {
     jobs: Job[]
-    services: { id: string; name: string; price: number; duration_min: number }[]
+    services: Service[]
 }
 
 export function DashboardContent({ jobs: allJobs, services }: DashboardContentProps) {
