@@ -70,13 +70,25 @@ export async function getBranchStats(
         }
     }
 
-    const totalJobs = jobs.length
-    const revenue = jobs.filter(j => j.payment_status === 'paid').reduce((sum, j) => sum + (j.price || 0), 0)
-    const pendingRevenue = jobs.filter(j => j.payment_status === 'pending').reduce((sum, j) => sum + (j.price || 0), 0)
+    // Cast to any to handle nested relations properly
+    const jobsTyped = jobs as unknown as {
+        id: string
+        price: number | null
+        payment_status: string
+        closed_at: string | null
+        car_id: string | null
+        service_id: string | null
+        cars: { make: string | null; vehicle_class: string } | null
+        services: { name: string } | null
+    }[]
+
+    const totalJobs = jobsTyped.length
+    const revenue = jobsTyped.filter(j => j.payment_status === 'paid').reduce((sum, j) => sum + (j.price || 0), 0)
+    const pendingRevenue = jobsTyped.filter(j => j.payment_status === 'pending').reduce((sum, j) => sum + (j.price || 0), 0)
     const avgJobValue = totalJobs > 0 ? revenue / totalJobs : 0
 
     const brandMap = new Map<string | null, number>()
-    jobs.forEach(job => {
+    jobsTyped.forEach(job => {
         const make = job.cars?.make || 'Bilinmeyen'
         brandMap.set(make, (brandMap.get(make) || 0) + 1)
     })
@@ -85,7 +97,7 @@ export async function getBranchStats(
         .sort((a, b) => b.count - a.count)
 
     const serviceMap = new Map<string | null, number>()
-    jobs.forEach(job => {
+    jobsTyped.forEach(job => {
         const name = job.services?.name || 'Bilinmiyor'
         serviceMap.set(name, (serviceMap.get(name) || 0) + 1)
     })
@@ -102,7 +114,7 @@ export async function getBranchStats(
         pickup: 'Pikap',
         luxury: 'Lüks',
     }
-    jobs.forEach(job => {
+    jobsTyped.forEach(job => {
         const vc = job.cars?.vehicle_class || 'unknown'
         const label = vcLabels[vc] || vc
         vcMap.set(label, (vcMap.get(label) || 0) + 1)
