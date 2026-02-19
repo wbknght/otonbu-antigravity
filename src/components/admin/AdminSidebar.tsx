@@ -14,6 +14,7 @@ import {
     Building2,
     Globe,
     Crown,
+    BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tr } from '@/lib/i18n/tr'
@@ -32,6 +33,7 @@ const universalNav = [
 const branchNav = [
     { name: tr.adminNav.pricing, href: '/admin/pricing', icon: DollarSign, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.staff, href: '/admin/staff', icon: Users, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
+    { name: 'İstatistikler', href: '/admin/stats', icon: BarChart3, roles: ['super_admin', 'partner', 'branch_admin', 'manager'] },
     { name: tr.adminNav.settings, href: '/admin/settings', icon: Settings, roles: ['super_admin', 'partner'] },
     { name: tr.adminNav.audit, href: '/admin/audit', icon: ClipboardList, roles: ['super_admin', 'partner'] },
 ]

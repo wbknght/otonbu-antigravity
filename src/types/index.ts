@@ -159,6 +159,34 @@ export const KANBAN_COLUMNS: { id: JobStatus; title: string }[] = [
     { id: 'completed', title: 'Tamamlandı' },
 ]
 
+// Stats types
+export type StatsPeriod = 'last7days' | 'thisWeek' | 'thisMonth' | 'lastMonth' | 'all' | 'custom'
+
+export interface DateRange {
+    start: string
+    end: string
+}
+
+export interface BranchStats {
+    totalJobs: number
+    revenue: number
+    pendingRevenue: number
+    avgJobValue: number
+    byBrand: { make: string | null; count: number }[]
+    byService: { name: string | null; count: number }[]
+    byVehicleClass: { class: string; count: number }[]
+}
+
+export interface WorkerStats {
+    workers: {
+        userId: string
+        fullName: string
+        claimed: number
+        completed: number
+        completionRate: number
+    }[]
+}
+
 // Permission helper: can this role move a job status?
 export function canMoveStatus(role: StaffRole, isAssigned: boolean): boolean {
     if (role === 'super_admin' || role === 'branch_admin' || role === 'manager') return true
