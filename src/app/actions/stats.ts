@@ -198,7 +198,7 @@ export async function getBranchStats(
         vcMap.set(label, (vcMap.get(label) || 0) + 1)
     })
     const byVehicleClass = Array.from(vcMap.entries())
-        .map(([class: cls, count]) => ({ class: cls, count }))
+        .map(([vc, count]) => ({ class: vc, count }))
         .sort((a, b) => b.count - a.count)
 
     return {
